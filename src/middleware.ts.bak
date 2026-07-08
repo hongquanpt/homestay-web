@@ -1,0 +1,66 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+// Bộ nhớ đệm tạm thời lưu trữ số lượt truy cập theo IP
+const ipRequestCounts = new Map<string, { count: number, resetTime: number }>();
+
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 phút
+const MAX_REQUESTS_PER_WINDOW = 30; // Tối đa 30 request mỗi phút
+
+export function middleware(request: NextRequest) {
+  // Chỉ áp dụng Rate Limit cho các đường dẫn API (ngoại trừ /api/auth để NextAuth hoạt động bình thường)
+  if (request.nextUrl.pathname.startsWith('/api/') && !request.nextUrl.pathname.startsWith('/api/auth/')) {
+    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    
+    const now = Date.now();
+    const record = ipRequestCounts.get(ip);
+
+    if (record) {
+      if (now > record.resetTime) {
+        // Đã qua 1 phút, reset lại bộ đếm
+        ipRequestCounts.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+      } else {
+        // Tăng bộ đếm
+        record.count++;
+        if (record.count > MAX_REQUESTS_PER_WINDOW) {
+          // Vượt quá giới hạn -> Chặn
+          return new NextResponse(
+            JSON.stringify({ 
+              error: 'Too Many Requests', 
+              message: 'Bạn đã thực hiện quá nhiều thao tác. Vui lòng đợi 1 phút rồi thử lại.' 
+            }),
+            { 
+              status: 429, 
+              headers: { 
+                'Content-Type': 'application/json',
+                'Retry-After': Math.ceil((record.resetTime - now) / 1000).toString()
+              } 
+            }
+          );
+        }
+      }
+    } else {
+      // Request đầu tiên từ IP này
+      ipRequestCounts.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    }
+
+    // Dọn dẹp bộ nhớ chống tràn RAM nếu có quá nhiều IP (DDoS nhẹ)
+    if (ipRequestCounts.size > 2000) {
+      for (const [key, val] of ipRequestCounts.entries()) {
+        if (now > val.resetTime) {
+          ipRequestCounts.delete(key);
+        }
+      }
+    }
+  }
+
+  // Cho phép đi tiếp
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    // Bắt các đường dẫn API
+    '/api/:path*',
+  ],
+};

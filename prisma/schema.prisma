@@ -1,0 +1,353 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  auditLogs AuditLog[]
+}
+
+model Role {
+  id          String       @id @default(cuid())
+  name        String       @unique // Super Admin, Reception, Accounting, Marketing
+  users       User[]
+  permissions Permission[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Permission {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RoomType {
+  id          String   @id @default(cuid())
+  name        String   @unique // Standard, Deluxe, Premium, Cinema Room, VIP Room
+  description String?
+  rooms       Room[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Facility {
+  id          String   @id @default(cuid())
+  name        String
+  address     String?
+  description String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  rooms       Room[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+model Room {
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
+  pricePerHour   Float
+  pricePerNight  Float
+  priceNoon      Float           @default(260000)
+  priceAfternoon Float           @default(260000)
+  priceEvening   Float           @default(260000)
+  priceOvernight Float           @default(420000)
+  roomTypeId     String
+  roomType       RoomType        @relation(fields: [roomTypeId], references: [id])
+  facilityId     String?
+  facility       Facility?       @relation(fields: [facilityId], references: [id])
+  status         String          @default("ACTIVE") // ACTIVE, MAINTENANCE
+  images         RoomImage[]
+  amenities      Amenity[]       @relation("RoomAmenities")
+  accessInfo     RoomAccessInfo?
+  discounts      RoomDiscount[]
+  bookings       BookingDetail[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model RoomImage {
+  id        String   @id @default(cuid())
+  url       String
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Amenity {
+  id        String   @id @default(cuid())
+  name      String   @unique // Wifi, Netflix, Máy chiếu...
+  icon      String?
+  rooms     Room[]   @relation("RoomAmenities")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RoomAccessInfo {
+  id            String   @id @default(cuid())
+  roomId        String   @unique
+  room          Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  address       String
+  houseNumber   String
+  roomNumber    String
+  floor         String?
+  doorPassword  String?
+  roomPassword  String?
+  wifiName      String?
+  wifiPassword  String?
+  parkingInfo   String?
+  googleMapsUrl String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model RoomDiscount {
+  id          String   @id @default(cuid())
+  roomId      String
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int      // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  packageId   String   // 'noon', 'afternoon', 'evening', 'overnight', or 'ALL'
+  discountPct Float?   
+  discountAmt Float?   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([roomId, dayOfWeek, packageId])
+}
+
+model SurchargeRule {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   // 'DATE' or 'DAY_OF_WEEK'
+  targetDate    DateTime?
+  dayOfWeek     Int?     // 0 = Sunday, 6 = Saturday
+  packageId     String   // 'ALL', 'noon', 'afternoon', 'evening', 'overnight'
+  surchargePct  Float?
+  surchargeAmt  Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Booking {
+  id            String          @id @default(cuid())
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  numGuests     Int             @default(1)
+  notes         String?
+  frontIdCardUrl String?
+  backIdCardUrl  String?
+  totalAmount   Float
+  status        BookingStatus   @default(PENDING_PAYMENT)
+  couponId      String?
+  coupon        Coupon?         @relation(fields: [couponId], references: [id])
+  payment       Payment?
+  details       BookingDetail[]
+  products      BookingProduct[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  emailLogs     EmailLog[]
+  giftCampaigns GiftCampaign[]  @relation("BookingGifts")
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  PAYMENT_VERIFICATION_PENDING
+  PAID
+  EMAIL_SENT
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+}
+
+model BookingDetail {
+  id        String   @id @default(cuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookingProduct {
+  id        String   @id @default(cuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  price     Float
+  createdAt DateTime @default(now())
+}
+
+model Payment {
+  id            String               @id @default(cuid())
+  bookingId     String               @unique
+  booking       Booking              @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  amount        Float
+  method        PaymentMethod
+  status        PaymentStatus        @default(PENDING)
+  transactions  PaymentTransaction[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+}
+
+enum PaymentMethod {
+  QR_BANKING
+  MANUAL
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model PaymentTransaction {
+  id            String   @id @default(cuid())
+  paymentId     String
+  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  transactionId String?
+  amount        Float
+  status        String
+  webhookData   Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique // Đồ ăn, Nước uống, Trang trí...
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  price       Float
+  imageUrl    String?
+  maxQuantity Int             @default(99)
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  bookings    BookingProduct[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Coupon {
+  id            String        @id @default(cuid())
+  code          String        @unique
+  discountPct   Float?
+  discountAmt   Float?
+  validFrom     DateTime
+  validTo       DateTime
+  maxUsage      Int?
+  usedCount     Int           @default(0)
+  bookings      Booking[]
+  usages        CouponUsage[]
+  isPublic      Boolean       @default(true)
+  autoSendAfterBookings Int?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model CouponUsage {
+  id        String   @id @default(cuid())
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  bookingId String
+  usedAt    DateTime @default(now())
+}
+
+model GiftCampaign {
+  id          String   @id @default(cuid())
+  name        String // Tặng nước, tặng hoa
+  condition   Json     // Điều kiện: đơn trên X tiền, qua đêm...
+  isActive    Boolean  @default(true)
+  bookings    Booking[] @relation("BookingGifts")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  recipient String
+  subject   String
+  status    String   // SENT, FAILED
+  error     String?
+  sentAt    DateTime @default(now())
+}
+
+model SystemSetting {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  value         String
+  description   String?
+  updatedAt     DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  target    String
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
+
+model BlacklistIp {
+  id        String   @id @default(cuid())
+  ip        String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model BlacklistPhone {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model BlacklistEmail {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model VisitorLog {
+  id        String   @id @default(cuid())
+  ip        String   @unique
+  userAgent String?
+  visitedAt DateTime @default(now())
+}
