@@ -59,6 +59,10 @@ export default function AdminBookingsPage() {
  const { toast } = useToast();
  const [confirmAction, setConfirmAction] = useState<{ isOpen: boolean, type: string, value: string }>({ isOpen: false, type: "", value: "" });
  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+ const [isEditingEmail, setIsEditingEmail] = useState(false);
+ const [editedEmail, setEditedEmail] = useState("");
+ const [isEditingPhone, setIsEditingPhone] = useState(false);
+ const [editedPhone, setEditedPhone] = useState("");
 
  const fetchBookings = async () => {
  try {
@@ -154,6 +158,44 @@ export default function AdminBookingsPage() {
  } finally {
  setConfirmAction({ isOpen: false, type: "", value: "" });
  }
+ };
+
+ const handleUpdatePhone = async () => {
+   if (!selectedBooking) return;
+   try {
+     const res = await fetch(`/api/bookings/${selectedBooking.id}`, {
+       method: "PUT",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ customerPhone: editedPhone })
+     });
+     if (!res.ok) throw new Error("Failed to update phone");
+     
+     toast({ title: "Thành công", description: "Đã cập nhật số điện thoại khách hàng" });
+     setSelectedBooking({ ...selectedBooking, customerPhone: editedPhone });
+     setIsEditingPhone(false);
+     fetchBookings();
+   } catch (error) {
+     toast({ title: "Lỗi", description: "Không thể cập nhật số điện thoại", variant: "destructive" });
+   }
+ };
+
+ const handleUpdateEmail = async () => {
+   if (!selectedBooking) return;
+   try {
+     const res = await fetch(`/api/bookings/${selectedBooking.id}`, {
+       method: "PUT",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ customerEmail: editedEmail })
+     });
+     if (!res.ok) throw new Error("Failed to update email");
+     
+     toast({ title: "Thành công", description: "Đã cập nhật email khách hàng" });
+     setSelectedBooking({ ...selectedBooking, customerEmail: editedEmail });
+     setIsEditingEmail(false);
+     fetchBookings();
+   } catch (error) {
+     toast({ title: "Lỗi", description: "Không thể cập nhật email", variant: "destructive" });
+   }
  };
 
  const handleSendEmail = async (id: string) => {
@@ -331,7 +373,13 @@ export default function AdminBookingsPage() {
  confirmText="Chặn"
  />
 
- <Dialog open={!!selectedBooking} onOpenChange={(open) => !open && setSelectedBooking(null)}>
+ <Dialog open={!!selectedBooking} onOpenChange={(open) => {
+   if (!open) {
+     setSelectedBooking(null);
+     setIsEditingEmail(false);
+     setIsEditingPhone(false);
+   }
+ }}>
   <DialogContent className="max-w-xl">
     <DialogHeader>
       <DialogTitle>Chi tiết đơn đặt phòng</DialogTitle>
@@ -349,18 +397,64 @@ export default function AdminBookingsPage() {
           </div>
           <div>
             <p className="text-sm text-zinc-500">Số điện thoại</p>
-            <div className="flex items-center gap-2">
-              <p className="font-medium text-base">{selectedBooking.customerPhone}</p>
-              {selectedBooking.visitCount > 1 ? (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Khách quen (x{selectedBooking.visitCount})</span>
-              ) : (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700">Khách mới</span>
-              )}
-            </div>
+            {isEditingPhone ? (
+              <div className="flex items-center gap-2 mt-1">
+                <Input 
+                  value={editedPhone} 
+                  onChange={(e) => setEditedPhone(e.target.value)} 
+                  className="h-8 text-sm w-full"
+                  placeholder="Nhập SĐT mới"
+                />
+                <Button size="sm" onClick={handleUpdatePhone} className="h-8">Lưu</Button>
+                <Button size="sm" variant="ghost" onClick={() => setIsEditingPhone(false)} className="h-8 px-2">Hủy</Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-1">
+                <p className="font-medium text-base">{selectedBooking.customerPhone}</p>
+                <button 
+                  onClick={() => {
+                    setEditedPhone(selectedBooking.customerPhone || "");
+                    setIsEditingPhone(true);
+                  }}
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  Sửa
+                </button>
+                {selectedBooking.visitCount > 1 ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Khách quen (x{selectedBooking.visitCount})</span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700">Khách mới</span>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <p className="text-sm text-zinc-500">Email</p>
-            <p className="font-medium text-base">{selectedBooking.customerEmail || "Không có"}</p>
+            {isEditingEmail ? (
+              <div className="flex items-center gap-2 mt-1">
+                <Input 
+                  value={editedEmail} 
+                  onChange={(e) => setEditedEmail(e.target.value)} 
+                  className="h-8 text-sm w-full"
+                  placeholder="Nhập email mới"
+                />
+                <Button size="sm" onClick={handleUpdateEmail} className="h-8">Lưu</Button>
+                <Button size="sm" variant="ghost" onClick={() => setIsEditingEmail(false)} className="h-8 px-2">Hủy</Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-base">{selectedBooking.customerEmail || "Không có"}</p>
+                <button 
+                  onClick={() => {
+                    setEditedEmail(selectedBooking.customerEmail || "");
+                    setIsEditingEmail(true);
+                  }}
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  Sửa
+                </button>
+              </div>
+            )}
           </div>
           <div>
             <p className="text-sm text-zinc-500">Số khách</p>

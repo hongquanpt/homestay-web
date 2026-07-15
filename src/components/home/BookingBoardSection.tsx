@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ChevronRight } from "lucide-react";
+import { Loader2, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 import Swal from 'sweetalert2';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { format, addMonths } from "date-fns";
+import { vi } from "date-fns/locale";
 
 const defaultBookingPackages = [
   { id: "noon", label: "11:00 - 14:00", start: "11:00", end: "14:00" },
@@ -16,7 +21,7 @@ const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
 export function BookingBoardSection() {
   const router = useRouter();
-  const [currentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [boardData, setBoardData] = useState<{ rooms: any[], bookings: any[], facilities: any[], settings?: { discount_2_slots: number, discount_3_slots: number, discount_4_slots: number } }>({ rooms: [], bookings: [], facilities: [] });
   const [gridData, setGridData] = useState<any[]>([]);
@@ -50,7 +55,8 @@ export function BookingBoardSection() {
     const next7Days = Array.from({ length: 7 }).map((_, i) => {
       const d = new Date(currentDate);
       d.setDate(currentDate.getDate() + i);
-      return { dateStr: formatDate(d), dayOfWeek: d.getDay(), displayDate: `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`, displayDay: i === 0 ? "Hôm nay" : ["CN", "T2", "T3", "T4", "T5", "T6", "T7"][d.getDay()] };
+      const isToday = d.toDateString() === new Date().toDateString();
+      return { dateStr: formatDate(d), dayOfWeek: d.getDay(), displayDate: `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`, displayDay: isToday ? "Hôm nay" : ["CN", "T2", "T3", "T4", "T5", "T6", "T7"][d.getDay()] };
     });
 
     const grid = next7Days.map(day => {
@@ -115,7 +121,7 @@ export function BookingBoardSection() {
       } catch (e) { console.error('SSE Error:', e); }
     };
     return () => eventSource.close();
-  }, [selectedFacilityId]);
+  }, [selectedFacilityId, currentDate]);
 
   const formatPrice = (price: number) => (price / 1000) + 'k';
 
@@ -262,6 +268,29 @@ export function BookingBoardSection() {
           <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
         ) : (
           <div className="border border-zinc-200 bg-white relative">
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b border-zinc-200 bg-zinc-50 gap-4">
+              <span className="font-oswald tracking-widest text-zinc-500 uppercase text-sm">Hiển thị lịch cho 7 ngày tính từ ngày đã chọn</span>
+              <Popover>
+                <PopoverTrigger className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-zinc-300 bg-white hover:bg-zinc-100 hover:text-zinc-900 shadow-sm h-9 px-4 py-2 font-oswald tracking-widest text-zinc-700">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {format(currentDate, "dd/MM/yyyy", { locale: vi })}
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={currentDate}
+                    onSelect={(date) => {
+                      if (date) setCurrentDate(date);
+                    }}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today || date > addMonths(today, 2);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full border-collapse min-w-[800px] text-sm">
                 <thead>

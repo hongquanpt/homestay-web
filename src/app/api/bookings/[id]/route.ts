@@ -41,23 +41,28 @@ export async function PUT(
  }
 
  const body = await request.json();
- const { status } = body;
+ const { status, customerEmail, customerPhone } = body;
 
- if (!status) {
+ if (!status && customerEmail === undefined && customerPhone === undefined) {
  return NextResponse.json(
- { error: "Status is required" },
+ { error: "No data to update" },
  { status: 400 }
  );
  }
 
+ const dataToUpdate: any = {};
+ if (status) dataToUpdate.status = status;
+ if (customerEmail !== undefined) dataToUpdate.customerEmail = customerEmail;
+ if (customerPhone !== undefined) dataToUpdate.customerPhone = customerPhone;
+
  const updatedBooking = await prisma.booking.update({
  where: { id: params.id },
- data: { status },
+ data: dataToUpdate,
  });
 
  eventEmitter.emit('BOOKING_UPDATED', {
    id: updatedBooking.id,
-   status: updatedBooking.status
+   ...dataToUpdate
  });
 
  if (status === 'PAID' || status === 'CONFIRMED') {
