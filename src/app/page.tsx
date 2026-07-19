@@ -33,6 +33,12 @@ export default async function HomePage() {
  const zalo = settings.zalo || settings.hotline || "0901 234 567";
  const facebook = settings.fanpage_url || settings.facebook || "https://facebook.com";
  const tiktok = settings.tiktok_url || "";
+  const promoBanners = [
+    settings.promo_banner_1 || "",
+    settings.promo_banner_2 || "",
+    settings.promo_banner_3 || "",
+    settings.promo_banner_4 || "",
+  ];
   const vnTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"}));
   const todayDayOfWeek = vnTime.getDay();
 
@@ -146,7 +152,7 @@ export default async function HomePage() {
  {todayDiscounts.length > 0 && <TodayDiscountsBanner discounts={todayDiscounts} />}
 
  <HeroSection hotline={hotline} homestayName={homestayName} rooms={rooms} />
- <AvailableSlotsBanner availableSlots={availableSlotsToday} />
+ <AvailableSlotsBanner availableSlots={availableSlotsToday} promoBanners={promoBanners} />
  <BookingBoardSection />
  <AllRoomsSection rooms={rooms} homestayName={homestayName} />
  <PromotionsSection promotions={promotions} />
@@ -162,7 +168,7 @@ export default async function HomePage() {
   />
 
  {/* Footer */}
- <footer id="footer" className="py-16 bg-white text-zinc-900 border-t border-zinc-200">
+ <footer id="footer" className="py-16 bg-transparent text-zinc-900 border-t border-zinc-200">
  <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-12">
  <div className="flex items-center gap-3">
  <BedDouble strokeWidth={1} className="w-8 h-8 text-zinc-900" />

@@ -51,13 +51,13 @@
 }
 
 :root {
-  --background: oklch(1 0 0); /* Pure White */
-  --foreground: oklch(0.20 0 0); /* Dark gray/Black */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.20 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0 0);
-  --primary: oklch(0.65 0.1 110); /* Olive Green #8a9a7b approx */
+  --background: #fdfbf7; /* Lighter cream */
+  --foreground: #171717; /* Dark gray/Black */
+  --card: #fdfbf7;
+  --card-foreground: #171717;
+  --popover: #fdfbf7;
+  --popover-foreground: #171717;
+  --primary: #8a9a7b; /* Olive Green */
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.95 0 0);
   --secondary-foreground: oklch(0.20 0 0);
@@ -100,6 +100,10 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-jost), sans-serif;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+  }
+  .bg-background {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
   }
   html {
     font-family: var(--font-jost), sans-serif;

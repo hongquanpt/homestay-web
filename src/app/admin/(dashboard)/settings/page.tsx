@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Building, Mail, CreditCard, Shield } from "lucide-react";
+import { Save, Building, Mail, CreditCard, Shield, ImageIcon, Upload, X } from "lucide-react";
+import { useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,13 @@ export default function AdminSettingsPage() {
  admin_notification_email: "",
  telegram_bot_token: "",
  telegram_chat_id: "",
+ promo_banner_1: "",
+ promo_banner_2: "",
+ promo_banner_3: "",
+ promo_banner_4: "",
  });
+ const [uploadingBanner, setUploadingBanner] = useState<string | null>(null);
+ const bannerInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
  const [loading, setLoading] = useState(true);
  const { toast } = useToast();
 
@@ -135,6 +142,16 @@ export default function AdminSettingsPage() {
  >
  <Shield className="w-4 h-4" /> Bảo mật & Khác
  </button>
+ <button
+  onClick={() => setActiveTab("banners")}
+  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+  activeTab === "banners"
+  ? "bg-primary/5 text-primary "
+  : "text-zinc-600 hover:bg-zinc-50"
+  }`}
+  >
+  <ImageIcon className="w-4 h-4" /> Banner Trang chủ
+  </button>
  </div>
 
  {/* Content */}
@@ -289,6 +306,87 @@ export default function AdminSettingsPage() {
  </div>
  </div>
  )}
+
+  {activeTab === "banners" && (
+  <div className="space-y-6">
+  <h2 className="text-lg font-bold text-zinc-900 border-b border-zinc-200 pb-3">Banner Khuyến mãi Trang chủ</h2>
+  <p className="text-sm text-zinc-500">Upload 4 hình ảnh khuyến mãi hiển thị xung quanh khung giờ trống trên trang chủ. Khuyến nghị kích thước 600x450px.</p>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {[1, 2, 3, 4].map(n => {
+    const key = `promo_banner_${n}` as string;
+    const pos = n === 1 ? 'Trên - Trái' : n === 2 ? 'Trên - Phải' : n === 3 ? 'Dưới - Trái' : 'Dưới - Phải';
+    return (
+      <div key={n} className="space-y-3">
+        <Label className="text-sm font-semibold">Banner {n} <span className="font-normal text-zinc-400">({pos})</span></Label>
+        <div className="relative aspect-[4/3] rounded-xl border-2 border-dashed border-zinc-300 overflow-hidden bg-zinc-50 hover:border-primary/50 transition-colors group">
+          {settings[key] ? (
+            <>
+              <img src={settings[key]} alt={`Banner ${n}`} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                <button
+                  onClick={() => bannerInputRefs.current[key]?.click()}
+                  className="p-2 bg-white rounded-full shadow-lg hover:bg-zinc-50"
+                  title="Thay đổi"
+                >
+                  <Upload className="w-4 h-4 text-zinc-700" />
+                </button>
+                <button
+                  onClick={() => handleChange(key, '')}
+                  className="p-2 bg-white rounded-full shadow-lg hover:bg-red-50"
+                  title="Xóa"
+                >
+                  <X className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => bannerInputRefs.current[key]?.click()}
+              className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer"
+            >
+              {uploadingBanner === key ? (
+                <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-zinc-300" />
+                  <span className="text-xs text-zinc-400">Click để upload</span>
+                </>
+              )}
+            </button>
+          )}
+          <input
+            ref={el => { bannerInputRefs.current[key] = el; }}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              setUploadingBanner(key);
+              try {
+                const formData = new FormData();
+                formData.append('file', file);
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.url) {
+                  handleChange(key, data.url);
+                  toast({ title: 'Thành công', description: `Đã upload banner ${n}` });
+                }
+              } catch (err) {
+                toast({ title: 'Lỗi', description: 'Upload thất bại', variant: 'destructive' });
+              } finally {
+                setUploadingBanner(null);
+                e.target.value = '';
+              }
+            }}
+          />
+        </div>
+      </div>
+    );
+  })}
+  </div>
+  </div>
+  )}
 
  <div className="mt-8 pt-6 border-t border-zinc-200 flex justify-end">
  <Button onClick={handleSave} className="bg-gradient-to-r from-primary to-primary hover:from-primary hover:to-primary">

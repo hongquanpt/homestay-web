@@ -48,7 +48,7 @@ export function FeatureSection() {
  };
 
  return (
- <section id="why-us" className="py-24 bg-white border-t border-zinc-100">
+ <section id="why-us" className="py-24 bg-transparent border-t border-zinc-100">
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
  <motion.div 
  initial={{ opacity: 0, y: reduce ? 0 : 20 }}

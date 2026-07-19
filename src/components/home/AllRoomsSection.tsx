@@ -67,7 +67,7 @@ export function AllRoomsSection({ rooms, homestayName }: { rooms: any[]; homesta
   if (!filteredRooms || filteredRooms.length === 0) return null;
 
   return (
-    <section id="rooms" className="py-24 bg-white relative overflow-hidden">
+    <section id="rooms" className="py-24 bg-transparent relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         {/* Title */}
         <div className="text-center mb-16">

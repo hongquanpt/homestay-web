@@ -18,7 +18,7 @@ export function ContactSection({ hotline, address, email, zalo, facebook, tiktok
   const mapQuery = encodeURIComponent(address || homestayName);
 
   return (
-    <section id="contact" className="py-24 bg-white border-t border-zinc-200">
+    <section id="contact" className="py-24 bg-transparent border-t border-zinc-200">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-oswald uppercase tracking-[0.2em] text-zinc-900 inline-block border-b border-zinc-900 pb-2 mb-6">

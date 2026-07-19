@@ -201,7 +201,7 @@ export function BookingBoardSection() {
   const mergedInfo = getMergedSelection();
 
   return (
-    <section id="booking-board" className="py-24 bg-white border-y border-zinc-200">
+    <section id="booking-board" className="py-24 bg-transparent border-y border-zinc-200">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-oswald uppercase tracking-[0.2em] text-zinc-900 inline-block border-b border-zinc-900 pb-2 mb-6">
@@ -221,7 +221,7 @@ export function BookingBoardSection() {
           {boardData.facilities && boardData.facilities.length > 0 && (
             <div className="mb-12">
               <h3 className="text-xl font-oswald uppercase tracking-widest text-zinc-400 mb-6 relative">
-                <span className="bg-white px-4">CHỌN CƠ SỞ (HOUSE SELECTION)</span>
+                <span className="bg-background px-4">CHỌN CƠ SỞ (HOUSE SELECTION)</span>
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-zinc-200 -z-10"></div>
               </h3>
               
