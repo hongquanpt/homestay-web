@@ -469,37 +469,66 @@ export default function AdminBookingsPage() {
           </div>
         </div>
         
-        {(selectedBooking.frontIdCardUrl || selectedBooking.backIdCardUrl) && (
-          <div className="border-t border-zinc-200 pt-4 mt-2">
-            <p className="text-sm font-semibold mb-3">Hình ảnh CCCD</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Mặt trước</p>
-                {selectedBooking.frontIdCardUrl ? (
-                  <a href={selectedBooking.frontIdCardUrl} target="_blank" rel="noreferrer" className="block w-full h-32 rounded-lg border border-zinc-200 overflow-hidden hover:opacity-90 transition-opacity">
-                    <img src={selectedBooking.frontIdCardUrl} alt="Mặt trước CCCD" className="w-full h-full object-cover" />
-                  </a>
-                ) : (
-                  <div className="w-full h-32 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-center">
-                    <span className="text-sm text-zinc-400">Không có ảnh</span>
+        {(() => {
+          // Parse idCardsJson if available
+          const idCards: { frontUrl: string | null, backUrl: string | null }[] = (() => {
+            try {
+              if (selectedBooking.idCardsJson) {
+                return JSON.parse(selectedBooking.idCardsJson);
+              }
+            } catch (e) {}
+            // Fallback to legacy single CCCD
+            if (selectedBooking.frontIdCardUrl || selectedBooking.backIdCardUrl) {
+              return [{ frontUrl: selectedBooking.frontIdCardUrl, backUrl: selectedBooking.backIdCardUrl }];
+            }
+            return [];
+          })();
+
+          if (idCards.length === 0) return null;
+
+          return (
+            <div className="border-t border-zinc-200 pt-4 mt-2">
+              <p className="text-sm font-semibold mb-3">Hình ảnh CCCD {idCards.length > 1 ? `(${idCards.length} khách)` : ''}</p>
+              <div className="space-y-4">
+                {idCards.map((card, idx) => (
+                  <div key={idx}>
+                    {idCards.length > 1 && (
+                      <p className="text-xs font-medium text-zinc-700 mb-2 pb-1 border-b border-zinc-100">
+                        CCCD Khách {idx + 1}
+                      </p>
+                    )}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-zinc-500 mb-2">Mặt trước</p>
+                        {card.frontUrl ? (
+                          <a href={card.frontUrl} target="_blank" rel="noreferrer" className="block w-full h-32 rounded-lg border border-zinc-200 overflow-hidden hover:opacity-90 transition-opacity">
+                            <img src={card.frontUrl} alt={`Mặt trước CCCD ${idCards.length > 1 ? `khách ${idx + 1}` : ''}`} className="w-full h-full object-cover" />
+                          </a>
+                        ) : (
+                          <div className="w-full h-32 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-center">
+                            <span className="text-sm text-zinc-400">Không có ảnh</span>
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs text-zinc-500 mb-2">Mặt sau</p>
+                        {card.backUrl ? (
+                          <a href={card.backUrl} target="_blank" rel="noreferrer" className="block w-full h-32 rounded-lg border border-zinc-200 overflow-hidden hover:opacity-90 transition-opacity">
+                            <img src={card.backUrl} alt={`Mặt sau CCCD ${idCards.length > 1 ? `khách ${idx + 1}` : ''}`} className="w-full h-full object-cover" />
+                          </a>
+                        ) : (
+                          <div className="w-full h-32 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-center">
+                            <span className="text-sm text-zinc-400">Không có ảnh</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Mặt sau</p>
-                {selectedBooking.backIdCardUrl ? (
-                  <a href={selectedBooking.backIdCardUrl} target="_blank" rel="noreferrer" className="block w-full h-32 rounded-lg border border-zinc-200 overflow-hidden hover:opacity-90 transition-opacity">
-                    <img src={selectedBooking.backIdCardUrl} alt="Mặt sau CCCD" className="w-full h-full object-cover" />
-                  </a>
-                ) : (
-                  <div className="w-full h-32 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-center">
-                    <span className="text-sm text-zinc-400">Không có ảnh</span>
-                  </div>
-                )}
+                ))}
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {selectedBooking.products && selectedBooking.products.length > 0 && (
           <div className="border-t border-zinc-200 pt-4 mt-2">

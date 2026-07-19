@@ -49,6 +49,7 @@ export async function POST(request: Request) {
             notes: tempBooking.notes,
             frontIdCardUrl: tempBooking.frontIdCardUrl,
             backIdCardUrl: tempBooking.backIdCardUrl,
+            idCardsJson: tempBooking.idCardsJson,
             totalAmount: tempBooking.totalAmount,
             status: "PAID",
             couponId: tempBooking.couponId || undefined,

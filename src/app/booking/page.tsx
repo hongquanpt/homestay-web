@@ -224,8 +224,7 @@ function BookingContent() {
 
   const [couponCode, setCouponCode] = useState("");
   const [payosUrl, setPayosUrl] = useState<string | null>(null);
-  const [frontIdFile, setFrontIdFile] = useState<File | null>(null);
-  const [backIdFile, setBackIdFile] = useState<File | null>(null);
+  const [idCardFiles, setIdCardFiles] = useState<{ front: File | null, back: File | null }[]>([{ front: null, back: null }]);
   const [errorModal, setErrorModal] = useState<{ isOpen: boolean, message: string }>({ isOpen: false, message: "" });
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [discount2, setDiscount2] = useState(5);
@@ -307,6 +306,33 @@ function BookingContent() {
       totalDiscount: originalSum - (baseSum - consecutiveDiscountAmt - earlyBookingDiscountAmt)
     };
   }, [currentPkgs, customDetails, discount2, discount3, discount4, selectedDate, earlyBookingDays, earlyBookingDiscountPct, guests]);
+
+  // Determine if multi-CCCD is required (evening or overnight selected)
+  const requiresMultiCCCD = useMemo(() => {
+    if (customDetails) {
+      // For custom bookings from the board, check the time
+      const startTime = new Date(customDetails.startTime);
+      const startHour = startTime.getHours();
+      return startHour >= 18; // 18:00 onwards = evening or overnight
+    }
+    return selectedPackages.some(pkgId => pkgId === 'evening' || pkgId === 'overnight');
+  }, [selectedPackages, customDetails]);
+
+  // Sync idCardFiles array length with guest count when multi-CCCD is required
+  useEffect(() => {
+    const guestCount = parseInt(guests) || 1;
+    const requiredCount = requiresMultiCCCD ? guestCount : 1;
+    
+    setIdCardFiles(prev => {
+      if (prev.length === requiredCount) return prev;
+      if (prev.length < requiredCount) {
+        // Add more empty entries
+        return [...prev, ...Array.from({ length: requiredCount - prev.length }, () => ({ front: null, back: null }))];
+      }
+      // Trim excess entries
+      return prev.slice(0, requiredCount);
+    });
+  }, [guests, requiresMultiCCCD]);
   
   const roomSubtotal = roomSubtotalObj.final;
   const roomOriginalSubtotal = roomSubtotalObj.original;
@@ -548,23 +574,31 @@ function BookingContent() {
     try {
       setIsLoading(true);
 
-      let frontIdUrl = null;
-      let backIdUrl = null;
+      // Upload all CCCD files
+      const uploadedIdCards: { frontUrl: string | null, backUrl: string | null }[] = [];
+      for (const card of idCardFiles) {
+        let frontUrl: string | null = null;
+        let backUrl: string | null = null;
+        if (card.front) {
+          const formData = new FormData();
+          formData.append("file", card.front);
+          const res = await fetch("/api/upload-public", { method: "POST", body: formData });
+          const data = await res.json();
+          if (data.url) frontUrl = data.url;
+        }
+        if (card.back) {
+          const formData = new FormData();
+          formData.append("file", card.back);
+          const res = await fetch("/api/upload-public", { method: "POST", body: formData });
+          const data = await res.json();
+          if (data.url) backUrl = data.url;
+        }
+        uploadedIdCards.push({ frontUrl, backUrl });
+      }
 
-      if (frontIdFile) {
-        const formData = new FormData();
-        formData.append("file", frontIdFile);
-        const res = await fetch("/api/upload-public", { method: "POST", body: formData });
-        const data = await res.json();
-        if (data.url) frontIdUrl = data.url;
-      }
-      if (backIdFile) {
-        const formData = new FormData();
-        formData.append("file", backIdFile);
-        const res = await fetch("/api/upload-public", { method: "POST", body: formData });
-        const data = await res.json();
-        if (data.url) backIdUrl = data.url;
-      }
+      // Backward-compatible: first guest's CCCD
+      const frontIdUrl = uploadedIdCards[0]?.frontUrl || null;
+      const backIdUrl = uploadedIdCards[0]?.backUrl || null;
 
       let pkgStartIso = "";
       let pkgEndIso = "";
@@ -603,6 +637,7 @@ function BookingContent() {
         notes,
         frontIdCardUrl: frontIdUrl,
         backIdCardUrl: backIdUrl,
+        idCards: uploadedIdCards,
         startTime: pkgStartIso,
         endTime: pkgEndIso,
         price: priceToSubmit,
@@ -1025,42 +1060,68 @@ function BookingContent() {
 
             <div className="border border-zinc-200 bg-white p-6 md:p-8">
               <h3 className="text-xl font-oswald uppercase tracking-widest text-zinc-900 mb-2">02. UPLOAD CCCD</h3>
-              <p className="text-xs font-light tracking-widest text-zinc-500 uppercase mb-6 pb-4 border-b border-zinc-200">Vui lòng upload ảnh CCCD mặt trước và mặt sau để xác minh.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <Label className="font-oswald uppercase tracking-widest text-xs text-zinc-500 mb-2 block">Mặt trước *</Label>
-                  <label className="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-primary transition-colors cursor-pointer">
-                    {frontIdFile ? (
-                      <div className="flex items-center gap-2 text-sm text-primary font-oswald tracking-widest uppercase">
-                        <CheckCircle strokeWidth={1} className="w-5 h-5" />
-                        <span className="truncate max-w-[150px]">{frontIdFile.name}</span>
-                      </div>
-                    ) : (
-                      <>
-                        <Upload strokeWidth={1} className="w-6 h-6 text-zinc-400 mb-3" />
-                        <span className="font-oswald uppercase tracking-widest text-xs text-zinc-500">CLICK ĐỂ UPLOAD</span>
-                      </>
+              <p className="text-xs font-light tracking-widest text-zinc-500 uppercase mb-6 pb-4 border-b border-zinc-200">
+                {requiresMultiCCCD && parseInt(guests) > 1
+                  ? `Khung giờ tối/qua đêm yêu cầu upload CCCD cho tất cả ${guests} khách.`
+                  : 'Vui lòng upload ảnh CCCD mặt trước và mặt sau để xác minh.'
+                }
+              </p>
+              <div className="space-y-8">
+                {idCardFiles.map((card, idx) => (
+                  <div key={idx}>
+                    {idCardFiles.length > 1 && (
+                      <h4 className="font-oswald uppercase tracking-widest text-sm text-zinc-900 mb-4 pb-2 border-b border-zinc-100">
+                        CCCD KHÁCH {idx + 1}
+                      </h4>
                     )}
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => setFrontIdFile(e.target.files?.[0] || null)} />
-                  </label>
-                </div>
-                <div>
-                  <Label className="font-oswald uppercase tracking-widest text-xs text-zinc-500 mb-2 block">Mặt sau *</Label>
-                  <label className="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-primary transition-colors cursor-pointer">
-                    {backIdFile ? (
-                      <div className="flex items-center gap-2 text-sm text-primary font-oswald tracking-widest uppercase">
-                        <CheckCircle strokeWidth={1} className="w-5 h-5" />
-                        <span className="truncate max-w-[150px]">{backIdFile.name}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <Label className="font-oswald uppercase tracking-widest text-xs text-zinc-500 mb-2 block">
+                          Mặt trước {idCardFiles.length > 1 ? `(Khách ${idx + 1})` : ''} *
+                        </Label>
+                        <label className="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-primary transition-colors cursor-pointer">
+                          {card.front ? (
+                            <div className="flex items-center gap-2 text-sm text-primary font-oswald tracking-widest uppercase">
+                              <CheckCircle strokeWidth={1} className="w-5 h-5" />
+                              <span className="truncate max-w-[150px]">{card.front.name}</span>
+                            </div>
+                          ) : (
+                            <>
+                              <Upload strokeWidth={1} className="w-6 h-6 text-zinc-400 mb-3" />
+                              <span className="font-oswald uppercase tracking-widest text-xs text-zinc-500">CLICK ĐỂ UPLOAD</span>
+                            </>
+                          )}
+                          <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setIdCardFiles(prev => prev.map((c, i) => i === idx ? { ...c, front: file } : c));
+                          }} />
+                        </label>
                       </div>
-                    ) : (
-                      <>
-                        <Upload strokeWidth={1} className="w-6 h-6 text-zinc-400 mb-3" />
-                        <span className="font-oswald uppercase tracking-widest text-xs text-zinc-500">CLICK ĐỂ UPLOAD</span>
-                      </>
-                    )}
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => setBackIdFile(e.target.files?.[0] || null)} />
-                  </label>
-                </div>
+                      <div>
+                        <Label className="font-oswald uppercase tracking-widest text-xs text-zinc-500 mb-2 block">
+                          Mặt sau {idCardFiles.length > 1 ? `(Khách ${idx + 1})` : ''} *
+                        </Label>
+                        <label className="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-primary transition-colors cursor-pointer">
+                          {card.back ? (
+                            <div className="flex items-center gap-2 text-sm text-primary font-oswald tracking-widest uppercase">
+                              <CheckCircle strokeWidth={1} className="w-5 h-5" />
+                              <span className="truncate max-w-[150px]">{card.back.name}</span>
+                            </div>
+                          ) : (
+                            <>
+                              <Upload strokeWidth={1} className="w-6 h-6 text-zinc-400 mb-3" />
+                              <span className="font-oswald uppercase tracking-widest text-xs text-zinc-500">CLICK ĐỂ UPLOAD</span>
+                            </>
+                          )}
+                          <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setIdCardFiles(prev => prev.map((c, i) => i === idx ? { ...c, back: file } : c));
+                          }} />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

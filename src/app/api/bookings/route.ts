@@ -90,8 +90,10 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const {
-      customerName, customerPhone, customerEmail, numGuests, notes, totalAmount, paymentMethod, roomId, startTime, endTime, price, products, couponId, frontIdCardUrl, backIdCardUrl
+      customerName, customerPhone, customerEmail, numGuests, notes, totalAmount, paymentMethod, roomId, startTime, endTime, price, products, couponId, frontIdCardUrl, backIdCardUrl, idCards
     } = body;
+
+    const idCardsJson = idCards && idCards.length > 0 ? JSON.stringify(idCards) : null;
 
     if (!customerName || !customerPhone || !roomId || !startTime || !endTime) {
       return NextResponse.json({ error: "Thiếu thông vị bắt buộc" }, { status: 400 });
@@ -238,7 +240,7 @@ export async function POST(request: Request) {
       }
 
       (global as any).tempBookings.set(orderCode.toString(), {
-        customerName, customerPhone, customerEmail, numGuests: numGuests || 1, notes, frontIdCardUrl, backIdCardUrl,
+        customerName, customerPhone, customerEmail, numGuests: numGuests || 1, notes, frontIdCardUrl, backIdCardUrl, idCardsJson,
         totalAmount, roomId, startTime: new Date(startTime).getTime(), endTime: new Date(endTime).getTime(),
         price: price || totalAmount, createdAt: Date.now(), products, couponId
       });
@@ -251,7 +253,7 @@ export async function POST(request: Request) {
       const booking = await prisma.$transaction(async (tx) => {
         return await tx.booking.create({
           data: {
-            customerName, customerPhone, customerEmail, numGuests: numGuests || 1, notes, frontIdCardUrl, backIdCardUrl,
+            customerName, customerPhone, customerEmail, numGuests: numGuests || 1, notes, frontIdCardUrl, backIdCardUrl, idCardsJson,
             totalAmount, status: "PENDING_PAYMENT", couponId: couponId || undefined,
             details: { create: { roomId, startTime: new Date(startTime), endTime: new Date(endTime), price: price || totalAmount } },
             payment: { create: { amount: totalAmount, method: "MANUAL", status: "PENDING" } },
