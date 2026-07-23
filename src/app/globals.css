@@ -51,11 +51,11 @@
 }
 
 :root {
-  --background: #fdfbf7; /* Lighter cream */
+  --background: #fefcf5; /* Lighter pale cream */
   --foreground: #171717; /* Dark gray/Black */
-  --card: #fdfbf7;
+  --card: #fefcf5;
   --card-foreground: #171717;
-  --popover: #fdfbf7;
+  --popover: #fefcf5;
   --popover-foreground: #171717;
   --primary: #8a9a7b; /* Olive Green */
   --primary-foreground: oklch(1 0 0);

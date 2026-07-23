@@ -106,7 +106,7 @@ export function AdminLayoutClient({
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-zinc-500 hover:text-red-500"
-              onClick={() => signOut({ callbackUrl: "/admin/login" })}
+              onClick={() => signOut({ callbackUrl: "/hms-portal-9f8b2c1a/login" })}
             >
               <LogOut className="w-4 h-4" />
             </Button>

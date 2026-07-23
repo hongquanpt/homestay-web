@@ -9,7 +9,7 @@ export default withAuth(
  callbacks: {
  authorized: ({ req, token }) => {
  // Cho phép truy cập vào trang login mà không cần token
- if (req.nextUrl.pathname.startsWith("/admin/login")) {
+ if (req.nextUrl.pathname.startsWith("/hms-portal-9f8b2c1a/login")) {
  return true;
  }
  // Các trang khác trong /admin yêu cầu token
@@ -17,11 +17,11 @@ export default withAuth(
  },
  },
  pages: {
- signIn: "/admin/login",
+ signIn: "/hms-portal-9f8b2c1a/login",
  },
  }
 );
 
 export const config = {
- matcher: ["/admin/:path*"],
+ matcher: ["/hms-portal-9f8b2c1a/:path*"],
 };

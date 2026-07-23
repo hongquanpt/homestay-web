@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
  }
  },
  pages: {
- signIn: "/admin/login",
+ signIn: "/hms-portal-9f8b2c1a/login",
  },
  session: {
  strategy: "jwt",

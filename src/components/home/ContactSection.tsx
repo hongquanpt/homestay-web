@@ -10,10 +10,11 @@ interface ContactSectionProps {
   zalo: string;
   facebook: string;
   tiktok?: string;
+  instagram?: string;
   homestayName: string;
 }
 
-export function ContactSection({ hotline, address, email, zalo, facebook, tiktok, homestayName }: ContactSectionProps) {
+export function ContactSection({ hotline, address, email, zalo, facebook, tiktok, instagram, homestayName }: ContactSectionProps) {
   // Extract coordinates or use a general search query for the map
   const mapQuery = encodeURIComponent(address || homestayName);
 
@@ -73,9 +74,9 @@ export function ContactSection({ hotline, address, email, zalo, facebook, tiktok
 
             <div>
               <h3 className="text-xl font-oswald uppercase tracking-widest text-zinc-900 mb-8 border-b border-zinc-200 pb-4">
-                MẠNG XÃ HỘI
+                THEO DÕI CHÚNG MÌNH QUA
               </h3>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-4">
                 <a 
                   href={facebook.startsWith('http') ? facebook : `https://${facebook}`} 
                   target="_blank" 
@@ -91,8 +92,12 @@ export function ContactSection({ hotline, address, email, zalo, facebook, tiktok
                   target="_blank" 
                   rel="noreferrer"
                   className="w-12 h-12 border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-primary hover:border-primary hover:text-white transition-colors duration-300"
+                  title="Zalo"
                 >
-                  <MessageCircle strokeWidth={1} className="w-5 h-5" />
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M21 11.5C21 6.25 16.97 2 12 2C7.03 2 3 6.25 3 11.5C3 16.75 7.03 21 12 21C13.44 21 14.79 20.66 16 20.04L20.5 21.5L19.26 17.16C20.36 15.59 21 13.63 21 11.5Z" />
+                    <text x="12" y="14.5" fill="currentColor" stroke="none" fontSize="8" fontWeight="bold" textAnchor="middle">Zalo</text>
+                  </svg>
                 </a>
                 {tiktok && (
                   <a 
@@ -103,6 +108,20 @@ export function ContactSection({ hotline, address, email, zalo, facebook, tiktok
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 448 512" fill="currentColor">
                       <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
+                    </svg>
+                  </a>
+                )}
+                {instagram && (
+                  <a 
+                    href={instagram.startsWith('http') ? instagram : `https://${instagram}`} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="w-12 h-12 border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-primary hover:border-primary hover:text-white transition-colors duration-300"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                     </svg>
                   </a>
                 )}

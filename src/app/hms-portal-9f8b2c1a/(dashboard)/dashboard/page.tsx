@@ -98,7 +98,7 @@ export default function AdminDashboardPage() {
  </div>
 
  {/* Card 2 */}
- <Link href="/admin/bookings" className="block bg-white p-5 rounded-xl border border-zinc-200 shadow-sm relative overflow-hidden group hover:border-primary hover:shadow-md transition-all cursor-pointer">
+ <Link href="/hms-portal-9f8b2c1a/bookings" className="block bg-white p-5 rounded-xl border border-zinc-200 shadow-sm relative overflow-hidden group hover:border-primary hover:shadow-md transition-all cursor-pointer">
  <div className="flex justify-between items-start mb-4">
  <div className="p-2 bg-blue-100 rounded-lg text-blue-600 ">
  <CalendarDays className="w-5 h-5" />

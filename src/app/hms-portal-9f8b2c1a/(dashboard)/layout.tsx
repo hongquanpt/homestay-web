@@ -11,7 +11,7 @@ export default async function AdminLayout({
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/admin/login");
+    redirect("/hms-portal-9f8b2c1a/login");
   }
 
   return (

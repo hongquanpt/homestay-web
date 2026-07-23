@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
  if (res?.error) {
  setError(res.error);
  } else {
- router.push("/admin/dashboard");
+ router.push("/hms-portal-9f8b2c1a/dashboard");
  router.refresh();
  }
  };

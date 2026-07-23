@@ -23,6 +23,7 @@ export default function AdminSettingsPage() {
  address: "",
  fanpage_url: "",
  tiktok_url: "",
+ instagram_url: "",
  zalo: "",
  house_rules: "",
  smtp_host: "",
@@ -187,6 +188,10 @@ export default function AdminSettingsPage() {
   <div className="md:col-span-2">
   <Label>TikTok URL</Label>
   <Input value={settings.tiktok_url || ''} onChange={e => handleChange('tiktok_url', e.target.value)} className="mt-1.5" placeholder="https://tiktok.com/@homestay" />
+  </div>
+  <div className="md:col-span-2">
+  <Label>Instagram URL</Label>
+  <Input value={settings.instagram_url || ''} onChange={e => handleChange('instagram_url', e.target.value)} className="mt-1.5" placeholder="https://instagram.com/homestay" />
   </div>
   <div className="md:col-span-2">
   <Label>Số Zalo (hoặc Link Zalo)</Label>

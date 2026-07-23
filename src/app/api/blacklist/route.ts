@@ -73,8 +73,8 @@ export async function POST(request: Request) {
  );
  }
 
- revalidatePath("/admin/blacklist");
- revalidatePath("/admin/visitor-logs");
+ revalidatePath("/hms-portal-9f8b2c1a/blacklist");
+ revalidatePath("/hms-portal-9f8b2c1a/visitor-logs");
 
  return NextResponse.json({ success: true, data: result });
  } catch (error: any) {

@@ -33,6 +33,7 @@ export default async function HomePage() {
  const zalo = settings.zalo || settings.hotline || "0901 234 567";
  const facebook = settings.fanpage_url || settings.facebook || "https://facebook.com";
  const tiktok = settings.tiktok_url || "";
+ const instagram = settings.instagram_url || "";
   const promoBanners = [
     settings.promo_banner_1 || "",
     settings.promo_banner_2 || "",
@@ -164,6 +165,7 @@ export default async function HomePage() {
     zalo={zalo}
     facebook={facebook}
     tiktok={tiktok}
+    instagram={instagram}
     homestayName={homestayName}
   />
 
