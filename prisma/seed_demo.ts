@@ -58,12 +58,12 @@ async function main() {
     await prisma.systemSetting.create({ data: s });
   }
 
-  console.log("Tạo Cơ sở...");
+  console.log("Tạo Chi nhánh...");
   const f1 = await prisma.facility.create({
     data: {
       name: "Chi nhánh Long Biên",
       address: "123 Phố Trạm, Long Biên, Hà Nội",
-      description: "Cơ sở rộng rãi với thiết kế sân vườn thoáng mát.",
+      description: "Chi nhánh rộng rãi với thiết kế sân vườn thoáng mát.",
       imageUrl: "https://images.unsplash.com/photo-1549294413-26f195200c16?q=80&w=800&auto=format&fit=crop",
       isActive: true
     }

@@ -60,6 +60,24 @@ export async function PUT(
  data: dataToUpdate,
  });
 
+ // Cập nhật Payment nếu Admin xác nhận thanh toán (trạng thái PAID)
+ if (status === 'PAID') {
+   const payment = await prisma.payment.findUnique({
+     where: { bookingId: params.id }
+   });
+
+   if (payment && payment.method === 'MANUAL' && payment.status === 'PENDING') {
+     await prisma.payment.update({
+       where: { id: payment.id },
+       data: {
+         status: 'SUCCESS',
+         confirmedById: (session.user as any).id || null,
+         confirmedAt: new Date(),
+       }
+     });
+   }
+ }
+
  eventEmitter.emit('BOOKING_UPDATED', {
    id: updatedBooking.id,
    ...dataToUpdate

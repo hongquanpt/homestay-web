@@ -17,6 +17,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   auditLogs AuditLog[]
+  confirmedPayments Payment[] @relation("AdminConfirmedPayments")
 }
 
 model Role {
@@ -211,6 +212,9 @@ model Payment {
   method        PaymentMethod
   status        PaymentStatus        @default(PENDING)
   transactions  PaymentTransaction[]
+  confirmedById String?
+  confirmedBy   User?                @relation("AdminConfirmedPayments", fields: [confirmedById], references: [id])
+  confirmedAt   DateTime?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
 }

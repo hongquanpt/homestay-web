@@ -125,15 +125,15 @@ export function AllRoomsSection({ rooms, homestayName }: { rooms: any[]; homesta
                     <p className="text-white/90 font-light tracking-wider text-[10px] md:text-xs mb-3 text-center">
                       giá từ: <span className="text-white font-bold">{room.priceNight}</span>
                     </p>
-                    <div className="flex flex-col gap-2 w-[120px] md:w-[140px]">
+                    <div className="flex flex-col gap-2 w-[100px] md:w-[110px] mx-auto">
                       <RoomDetailDialog room={room}>
-                        <button className="w-full inline-block border border-white/50 text-white bg-black/40 backdrop-blur-md py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors">
+                        <button className="w-full inline-block border border-white/50 text-white bg-black/40 backdrop-blur-md py-1.5 text-[8px] md:text-[9px] uppercase tracking-[0.15em] hover:bg-white hover:text-black transition-colors">
                           chi tiết
                         </button>
                       </RoomDetailDialog>
                       <Link 
                         href={`/booking?room=${room.id}`}
-                        className="w-full text-center inline-block border border-[#d4b48f] text-[#d4b48f] bg-black/40 backdrop-blur-md py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] hover:bg-[#d4b48f] hover:text-black transition-colors"
+                        className="w-full text-center inline-block border border-[#d4b48f] text-[#d4b48f] bg-black/40 backdrop-blur-md py-1.5 text-[8px] md:text-[9px] uppercase tracking-[0.15em] hover:bg-[#d4b48f] hover:text-black transition-colors"
                       >
                         đặt ngay
                       </Link>

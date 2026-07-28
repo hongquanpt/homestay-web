@@ -193,6 +193,7 @@ export default function AdminUsersPage() {
  className="mt-1.5" 
  />
  </div>
+ {/* Ẩn chọn Quyền vì chỉ có 1 quyền mặc định
  <div>
  <Label>Quyền (Role)</Label>
  <Select value={formData.roleId} onValueChange={v => setFormData({...formData, roleId: v || ""})}>
@@ -208,6 +209,7 @@ export default function AdminUsersPage() {
  </SelectContent>
  </Select>
  </div>
+ */}
  <div className="pt-2 flex justify-end gap-2">
  <Button variant="outline" onClick={() => setIsOpen(false)}>Hủy</Button>
  <Button onClick={handleSave}>Lưu thay đổi</Button>
@@ -235,7 +237,7 @@ export default function AdminUsersPage() {
  <TableHeader>
  <TableRow className="bg-zinc-50 ">
  <TableHead className="font-semibold">Nhân viên</TableHead>
- <TableHead className="font-semibold">Quyền (Role)</TableHead>
+ {/* <TableHead className="font-semibold">Quyền (Role)</TableHead> */}
  <TableHead className="font-semibold text-center">Trạng thái</TableHead>
  <TableHead className="font-semibold text-right">Hành động</TableHead>
  </TableRow>
@@ -243,11 +245,11 @@ export default function AdminUsersPage() {
  <TableBody>
  {loading ? (
  <TableRow>
- <TableCell colSpan={4} className="text-center py-8 text-zinc-500">Đang tải dữ liệu...</TableCell>
+ <TableCell colSpan={3} className="text-center py-8 text-zinc-500">Đang tải dữ liệu...</TableCell>
  </TableRow>
  ) : filteredUsers.length === 0 ? (
  <TableRow>
- <TableCell colSpan={4} className="text-center py-8 text-zinc-500">Chưa có tài khoản nào</TableCell>
+ <TableCell colSpan={3} className="text-center py-8 text-zinc-500">Chưa có tài khoản nào</TableCell>
  </TableRow>
  ) : filteredUsers.map((user) => (
  <TableRow key={user.id} className="hover:bg-zinc-50 :bg-zinc-800/50">
@@ -262,12 +264,12 @@ export default function AdminUsersPage() {
  </div>
  </div>
  </TableCell>
- <TableCell>
+ {/* <TableCell>
  <div className="flex items-center gap-1.5">
  <ShieldCheck className={`w-4 h-4 ${user.role?.name === "Super Admin" ? "text-primary" : "text-zinc-400"}`} />
  <span className="text-sm font-medium">{user.role?.name || "No Role"}</span>
  </div>
- </TableCell>
+ </TableCell> */}
  <TableCell className="text-center">
  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 ">
  Hoạt động

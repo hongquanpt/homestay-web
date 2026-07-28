@@ -103,9 +103,9 @@ export default function FacilitiesPage() {
         setDescription("");
         setImageUrl("");
         setIsActive(true);
-        Swal.fire('Thành công', editingId ? 'Đã cập nhật cơ sở' : 'Đã thêm cơ sở mới', 'success');
+        Swal.fire('Thành công', editingId ? 'Đã cập nhật chi nhánh' : 'Đã thêm chi nhánh mới', 'success');
       } else {
-        Swal.fire('Lỗi', 'Có lỗi xảy ra khi lưu cơ sở', 'error');
+        Swal.fire('Lỗi', 'Có lỗi xảy ra khi lưu chi nhánh', 'error');
       }
     } catch (error) {
       console.error(error);
@@ -140,9 +140,9 @@ export default function FacilitiesPage() {
         const data = await res.json();
         if (data.success) {
           fetchFacilities();
-          Swal.fire('Đã xóa!', 'Cơ sở đã được xóa.', 'success');
+          Swal.fire('Đã xóa!', 'Chi nhánh đã được xóa.', 'success');
         } else {
-          Swal.fire('Lỗi', data.message || 'Không thể xóa cơ sở', 'error');
+          Swal.fire('Lỗi', data.message || 'Không thể xóa chi nhánh', 'error');
         }
       } catch (error) {
         console.error(error);
@@ -154,8 +154,8 @@ export default function FacilitiesPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">Quản lý Cơ sở</h1>
-          <p className="text-zinc-500 mt-1">Danh sách các cơ sở / chi nhánh của hệ thống</p>
+          <h1 className="text-2xl font-bold text-zinc-900">Quản lý Chi nhánh</h1>
+          <p className="text-zinc-500 mt-1">Danh sách các chi nhánh / chi nhánh của hệ thống</p>
         </div>
         <button
           onClick={() => {
@@ -172,24 +172,24 @@ export default function FacilitiesPage() {
           className="flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded hover:bg-zinc-800"
         >
           <Plus className="w-4 h-4" />
-          Thêm Cơ sở
+          Thêm Chi nhánh
         </button>
       </div>
 
       {isAdding && (
         <div className="bg-white p-6 rounded-lg border border-zinc-200 mb-8 shadow-sm">
-          <h2 className="text-lg font-bold mb-4">{editingId ? "Chỉnh sửa Cơ sở" : "Thêm Cơ sở mới"}</h2>
+          <h2 className="text-lg font-bold mb-4">{editingId ? "Chỉnh sửa Chi nhánh" : "Thêm Chi nhánh mới"}</h2>
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Tên cơ sở (*)</label>
+                <label className="block text-sm font-medium mb-1">Tên chi nhánh (*)</label>
                 <input
                   required
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   className="w-full border p-2 rounded"
-                  placeholder="VD: Cơ sở 1 - Quận 1"
+                  placeholder="VD: Chi nhánh 1 - Quận 1"
                 />
               </div>
               <div>
@@ -199,7 +199,7 @@ export default function FacilitiesPage() {
                   value={address}
                   onChange={e => setAddress(e.target.value)}
                   className="w-full border p-2 rounded"
-                  placeholder="Nhập địa chỉ cơ sở"
+                  placeholder="Nhập địa chỉ chi nhánh"
                 />
               </div>
             </div>
@@ -210,7 +210,7 @@ export default function FacilitiesPage() {
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 className="w-full border p-2 rounded h-20"
-                placeholder="Giới thiệu về cơ sở này"
+                placeholder="Giới thiệu về chi nhánh này"
               />
             </div>
 
@@ -268,7 +268,7 @@ export default function FacilitiesPage() {
                 type="submit"
                 className="px-4 py-2 bg-zinc-900 text-white rounded hover:bg-zinc-800"
               >
-                Lưu Cơ sở
+                Lưu Chi nhánh
               </button>
             </div>
           </form>
@@ -280,7 +280,7 @@ export default function FacilitiesPage() {
       ) : facilities.length === 0 ? (
         <div className="bg-white p-12 text-center border rounded-lg">
           <Building2 className="w-12 h-12 text-zinc-300 mx-auto mb-4" />
-          <p className="text-zinc-500">Chưa có cơ sở nào. Hãy thêm cơ sở đầu tiên.</p>
+          <p className="text-zinc-500">Chưa có chi nhánh nào. Hãy thêm chi nhánh đầu tiên.</p>
         </div>
       ) : (
         <div className="bg-white rounded-lg border overflow-hidden">
@@ -288,7 +288,7 @@ export default function FacilitiesPage() {
             <thead className="bg-zinc-50 text-xs uppercase text-zinc-500 border-b">
               <tr>
                 <th className="px-6 py-4 w-20">Hình ảnh</th>
-                <th className="px-6 py-4">Tên Cơ sở</th>
+                <th className="px-6 py-4">Tên Chi nhánh</th>
                 <th className="px-6 py-4 text-center">Trạng thái</th>
                 <th className="px-6 py-4">Địa chỉ</th>
                 <th className="px-6 py-4 text-center">Số phòng</th>

@@ -34,8 +34,8 @@ export function HomeHeader({ hotline, homestayName, hasBanner = false }: { hotli
             <span className={`text-lg font-bold font-oswald tracking-[0.15em] transition-colors ${isScrolled ? "text-zinc-900" : "text-white"}`}>
               {firstWord}
             </span>
-            <span className={`text-xs font-light tracking-[0.2em] uppercase transition-colors ${isScrolled ? "text-primary" : "text-primary"}`}>
-              {secondPart || "HOUSE"}
+            <span className={`text-sm font-medium tracking-[0.2em] uppercase transition-colors ${isScrolled ? "text-primary" : "text-primary"}`}>
+              {secondPart || "HOME"}
             </span>
           </div>
         </Link>

@@ -198,22 +198,24 @@ export default function AdminBookingsPage() {
    }
  };
 
- const handleSendEmail = async (id: string) => {
- try {
- const res = await fetch(`/api/bookings/${id}/send-email`, {
- method: "POST"
- });
- if (res.ok) {
- fetchBookings();
- toast({ title: "Thành công", description: "Đã gửi email thành công!" });
- } else {
- const err = await res.json();
- toast({ title: "Lỗi", description: err.error || "Gửi email thất bại", variant: "destructive" });
- }
- } catch (e) {
- toast({ title: "Lỗi", description: "Có lỗi xảy ra khi gửi email", variant: "destructive" });
- }
- };
+  const handleSendEmail = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/send-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        fetchBookings();
+        toast({ title: "Thành công", description: "Đã gửi email thành công!" });
+      } else {
+        const err = await res.json();
+        toast({ title: "Lỗi", description: err.error || "Gửi email thất bại", variant: "destructive" });
+      }
+    } catch (e) {
+      toast({ title: "Lỗi", description: "Có lỗi xảy ra khi gửi email", variant: "destructive" });
+    }
+  };
 
  return (
  <div className="space-y-6">

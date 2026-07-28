@@ -36,16 +36,24 @@ export async function POST(request: Request) {
  const bcrypt = require('bcryptjs');
  const hashedPassword = await bcrypt.hash(password, 10);
 
- const newUser = await prisma.user.create({
- data: {
- email,
- name,
- password: hashedPassword,
- roleId: roleId || null
- },
- include: {
- role: true
- }
+  let assignedRoleId = roleId;
+  if (!assignedRoleId) {
+    const defaultRole = await prisma.role.findFirst();
+    if (defaultRole) {
+      assignedRoleId = defaultRole.id;
+    }
+  }
+
+  const newUser = await prisma.user.create({
+  data: {
+  email,
+  name,
+  password: hashedPassword,
+  roleId: assignedRoleId
+  },
+  include: {
+  role: true
+  }
  });
 
  return NextResponse.json(newUser, { status: 201 });

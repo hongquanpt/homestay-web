@@ -178,8 +178,8 @@ export default async function HomePage() {
  <span className="text-lg font-bold font-oswald tracking-[0.15em] uppercase text-zinc-900">
  {homestayName.split(' ')[0]}
  </span>
- <span className="text-xs font-light tracking-[0.2em] uppercase text-primary">
- {homestayName.split(' ').slice(1).join(' ') || "HOUSE"}
+ <span className="text-sm font-medium tracking-[0.2em] uppercase text-primary">
+ {homestayName.split(' ').slice(1).join(' ') || "HOME"}
  </span>
  </div>
  </div>

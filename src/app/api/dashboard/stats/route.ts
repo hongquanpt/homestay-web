@@ -46,6 +46,9 @@ export async function GET() {
  const startOfLastMonth = new Date(vnTime.getFullYear(), vnTime.getMonth() - 1, 1);
  startOfLastMonth.setHours(startOfLastMonth.getHours() - 7);
 
+ const startOfYear = new Date(vnTime.getFullYear(), 0, 1);
+ startOfYear.setHours(startOfYear.getHours() - 7);
+
  const bookingsThisMonthList = await prisma.booking.findMany({
   where: { createdAt: { gte: startOfMonth } }
  });
@@ -83,21 +86,126 @@ export async function GET() {
  });
  const currentGuests = guestsAggr._sum.numGuests || 0;
 
- // 5. Thống kê theo biểu đồ (Giả lập doanh thu 7 ngày qua)
- // Để giữ code đơn giản, tôi sẽ trả về mảng tĩnh hoặc truy vấn đơn giản
- // Thực tế sẽ dùng GROUP BY DATE(createdAt)
- 
+  // 5. Thống kê theo biểu đồ (Doanh thu 7 ngày qua)
+  const sevenDaysAgo = new Date(vnTime.getFullYear(), vnTime.getMonth(), vnTime.getDate() - 6);
+  sevenDaysAgo.setHours(sevenDaysAgo.getHours() - 7); // UTC adjust
+
+  const bookings7Days = await prisma.booking.findMany({
+    where: {
+      createdAt: { gte: sevenDaysAgo },
+      status: { in: ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'] }
+    },
+    select: { createdAt: true, totalAmount: true }
+  });
+
+  const timeZone = "Asia/Ho_Chi_Minh";
+  const revenueChartData: { date: string, revenue: number }[] = [];
+  
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(vnTime);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+    revenueChartData.push({ date: dateStr, revenue: 0 });
+  }
+
+  bookings7Days.forEach(b => {
+    const dateStr = b.createdAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', timeZone });
+    const point = revenueChartData.find(p => p.date === dateStr);
+    if (point) {
+      point.revenue += b.totalAmount || 0;
+    }
+  });
+  // 6. Bảng xếp hạng Admin chốt đơn (Tiền mặt - MANUAL)
+  const adminPaymentsToday = await prisma.payment.groupBy({
+    by: ['confirmedById'],
+    where: {
+      method: 'MANUAL',
+      status: 'SUCCESS',
+      confirmedAt: { gte: startOfToday }
+    },
+    _sum: { amount: true },
+    _count: { id: true },
+    orderBy: { _sum: { amount: 'desc' } }
+  });
+
+  const adminPaymentsMonth = await prisma.payment.groupBy({
+    by: ['confirmedById'],
+    where: {
+      method: 'MANUAL',
+      status: 'SUCCESS',
+      confirmedAt: { gte: startOfMonth }
+    },
+    _sum: { amount: true },
+    _count: { id: true },
+    orderBy: { _sum: { amount: 'desc' } }
+  });
+
+  const adminPaymentsYear = await prisma.payment.groupBy({
+    by: ['confirmedById'],
+    where: {
+      method: 'MANUAL',
+      status: 'SUCCESS',
+      confirmedAt: { gte: startOfYear }
+    },
+    _sum: { amount: true },
+    _count: { id: true },
+    orderBy: { _sum: { amount: 'desc' } }
+  });
+
+  const userIds = [...new Set([...adminPaymentsToday, ...adminPaymentsMonth, ...adminPaymentsYear].map(p => p.confirmedById).filter(Boolean))] as string[];
+  const users = await prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, name: true, email: true }
+  });
+  const userMap = users.reduce((acc, user) => {
+    acc[user.id] = user.name || user.email.split('@')[0];
+    return acc;
+  }, {} as Record<string, string>);
+
+  const adminLeaderboardToday = adminPaymentsToday.filter(p => p.confirmedById).map(p => ({
+    adminId: p.confirmedById,
+    adminName: userMap[p.confirmedById as string] || 'Unknown',
+    totalAmount: p._sum.amount || 0,
+    count: p._count.id
+  }));
+
+  const adminLeaderboardMonth = adminPaymentsMonth.filter(p => p.confirmedById).map(p => ({
+    adminId: p.confirmedById,
+    adminName: userMap[p.confirmedById as string] || 'Unknown',
+    totalAmount: p._sum.amount || 0,
+    count: p._count.id
+  }));
+
+  const adminLeaderboardYear = adminPaymentsYear.filter(p => p.confirmedById).map(p => ({
+    adminId: p.confirmedById,
+    adminName: userMap[p.confirmedById as string] || 'Unknown',
+    totalAmount: p._sum.amount || 0,
+    count: p._count.id
+  }));
+
+  // 7. Cảnh báo đổi mật khẩu định kỳ (15 và ngày cuối tháng)
+  const todayDate = vnTime.getDate();
+  const tomorrow = new Date(vnTime);
+  tomorrow.setDate(vnTime.getDate() + 1);
+  const isLastDay = tomorrow.getDate() === 1;
+  const showPasswordReminder = todayDate === 15 || isLastDay;
+
   return NextResponse.json({
-  revenue: totalRevenue,
-  revenueToday,
-  revenueChange: revenueChange.toFixed(1),
-  revenueThisMonth,
-  revenueMonthChange: revenueMonthChange.toFixed(1),
-  newBookings: bookingsToday,
-  bookingsChange: bookingsChange.toFixed(1),
-  occupancy: occupancyRate.toFixed(1),
-  guests: currentGuests,
- });
+   revenue: totalRevenue,
+   revenueToday,
+   revenueChange: revenueChange.toFixed(1),
+   revenueThisMonth,
+   revenueMonthChange: revenueMonthChange.toFixed(1),
+   newBookings: bookingsToday,
+   bookingsChange: bookingsChange.toFixed(1),
+   occupancy: occupancyRate.toFixed(1),
+   guests: currentGuests,
+   adminLeaderboardToday,
+   adminLeaderboardMonth,
+   adminLeaderboardYear,
+   revenueChartData,
+   showPasswordReminder,
+  });
  } catch (error: any) {
  return NextResponse.json({ error: error.message }, { status: 500 });
  }

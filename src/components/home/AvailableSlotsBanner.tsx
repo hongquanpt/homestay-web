@@ -75,19 +75,19 @@ export function AvailableSlotsBanner({ availableSlots, promoBanners }: Available
                   
                   {/* Content Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-b from-[#4fa9e8]/40 via-transparent to-[#ffffff]/30 flex flex-col items-center justify-start pt-[110px] px-4 text-center z-10">
-                    <span className="text-white font-oswald text-[16px] uppercase tracking-[0.15em] drop-shadow-md mb-2">Hôm nay còn</span>
+                    <span className="text-[#55819e] font-oswald text-[16px] uppercase tracking-[0.15em] drop-shadow-sm mb-2">Hôm nay còn</span>
                     
                     <motion.span
                         key={availableSlots}
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 100 }}
-                        className="text-[140px] font-oswald font-bold text-white drop-shadow-lg leading-[1] my-0"
+                        className="text-[140px] font-oswald font-bold text-[#55819e] drop-shadow-sm leading-[1] my-0"
                     >
                         {availableSlots}
                     </motion.span>
                     
-                    <span className="text-white font-oswald text-[16px] uppercase tracking-[0.15em] drop-shadow-md mt-2">Khung giờ trống</span>
+                    <span className="text-[#55819e] font-oswald text-[16px] uppercase tracking-[0.15em] drop-shadow-sm mt-2">Khung giờ trống</span>
                     
                     {/* Cloud Button */}
                     <div className="absolute bottom-[80px] left-1/2 -translate-x-1/2">

@@ -221,7 +221,7 @@ export function BookingBoardSection() {
           {boardData.facilities && boardData.facilities.length > 0 && (
             <div className="mb-12">
               <h3 className="text-xl font-oswald uppercase tracking-widest text-zinc-400 mb-6 relative">
-                <span className="bg-background px-4">CHỌN CƠ SỞ (HOUSE SELECTION)</span>
+                <span className="bg-background px-4">CHỌN CHI NHÁNH (HOUSE SELECTION)</span>
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-zinc-200 -z-10"></div>
               </h3>
               
@@ -237,7 +237,7 @@ export function BookingBoardSection() {
                   <div className="absolute inset-0 bg-zinc-900/40 group-hover:bg-zinc-900/20 transition-colors z-10" />
                   <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=600&auto=format&fit=crop" alt="All" className="w-full h-full object-cover" />
                   <div className="absolute bottom-0 left-0 w-full p-6 z-20 text-left bg-gradient-to-t from-black/80 to-transparent">
-                    <h4 className="text-white font-oswald text-xl uppercase tracking-widest">TẤT CẢ CƠ SỞ</h4>
+                    <h4 className="text-white font-oswald text-xl uppercase tracking-widest">TẤT CẢ CHI NHÁNH</h4>
                     <p className="text-zinc-300 text-sm mt-1">Xem toàn bộ hệ thống</p>
                   </div>
                 </button>
@@ -299,7 +299,7 @@ export function BookingBoardSection() {
                       Tên phòng
                     </th>
                     {boardData.rooms.map((room, idx) => (
-                      <th key={`room-${room.id}`} colSpan={4} className={`sticky top-0 z-20 bg-zinc-50 text-zinc-900 border-b p-4 text-center font-oswald tracking-widest uppercase text-sm ${idx === boardData.rooms.length - 1 ? 'border-r border-zinc-200' : 'border-r-2 border-r-zinc-300'}`}>
+                      <th key={`room-${room.id}`} colSpan={4} className={`sticky top-0 z-20 bg-zinc-50 text-zinc-900 border-b p-4 text-center font-oswald tracking-widest uppercase text-sm ${idx === boardData.rooms.length - 1 ? 'border-r border-zinc-200' : 'border-r-[3px] border-zinc-400'}`}>
                         {room.name}
                       </th>
                     ))}
@@ -312,7 +312,7 @@ export function BookingBoardSection() {
                       defaultBookingPackages.map((pkg, pIdx) => {
                         const isLastRoom = rIdx === boardData.rooms.length - 1;
                         const isLastPkg = pIdx === defaultBookingPackages.length - 1;
-                        const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-2 border-r-zinc-300' : 'border-r border-zinc-200';
+                        const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-[3px] border-zinc-400' : 'border-r border-zinc-200';
                         return (
                           <th key={`pkg-${room.id}-${pkg.id}`} className={`sticky top-[53px] z-20 bg-white text-zinc-600 border-b p-3 text-center text-xs w-24 font-light tracking-wider ${borderClass}`}>
                             <div className="text-zinc-900">{pkg.start} - {pkg.end}</div>
@@ -334,7 +334,7 @@ export function BookingBoardSection() {
                           const isSelected = selectedCells.some(c => c.roomId === cell.roomId && c.dateStr === cell.dateStr && c.pkgId === cell.id);
                           const isLastRoom = roomIdx === day.roomCells.length - 1;
                           const isLastPkg = cellIdx === roomPkgs.length - 1;
-                          const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-2 border-r-zinc-300' : 'border-r border-zinc-200';
+                          const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-[3px] border-zinc-400' : 'border-r border-zinc-200';
                           
                           let cellClass = `cursor-pointer transition-colors border-b p-1 text-center h-20 relative ${borderClass} `;
                           if (cell.isBooked) {

@@ -40,7 +40,7 @@ export async function sendTelegramNotification(payload: TelegramNotificationPayl
 Mã đơn: <b>${payload.bookingId}</b>
 Khách hàng: <b>${payload.customerName}</b>
 Số điện thoại: <b>${payload.customerPhone}</b>
-Cơ sở: <b>${payload.facilityName}</b>
+Chi nhánh: <b>${payload.facilityName}</b>
 Phòng: <b>${payload.roomName}</b>
 Thời gian: <b>${payload.bookingTime}</b>
 Phương thức: <b>${payload.paymentMethod}</b>
@@ -69,5 +69,45 @@ Vui lòng kiểm tra trang quản trị để xem chi tiết!
     }
   } catch (error) {
     console.error("Failed to send Telegram notification:", error);
+  }
+}
+
+export async function sendRawTelegramMessage(message: string) {
+  try {
+    const settings = await prisma.systemSetting.findMany({
+      where: {
+        key: {
+          in: ["telegram_bot_token", "telegram_chat_id"],
+        },
+      },
+    });
+
+    const botToken = settings.find((s: any) => s.key === "telegram_bot_token")?.value;
+    const chatId = settings.find((s: any) => s.key === "telegram_chat_id")?.value;
+
+    if (!botToken || !chatId) {
+      return;
+    }
+
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: "HTML",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Telegram API Error:", errorData);
+    }
+  } catch (error) {
+    console.error("Failed to send raw Telegram message:", error);
   }
 }

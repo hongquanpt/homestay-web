@@ -8,7 +8,8 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
  const body = await request.json();
  const { name, roleId, password } = body;
 
- const dataToUpdate: any = { name, roleId: roleId || null };
+ const dataToUpdate: any = { name };
+ if (roleId) dataToUpdate.roleId = roleId;
  
  if (password) {
  dataToUpdate.password = await bcrypt.hash(password, 10);

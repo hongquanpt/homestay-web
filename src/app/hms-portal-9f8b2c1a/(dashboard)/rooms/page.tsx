@@ -454,11 +454,11 @@ export default function AdminRoomsPage() {
  </Select>
  </div>
  <div>
- <Label>Cơ sở (Facility)</Label>
+ <Label>Chi nhánh (Facility)</Label>
  <Select value={formData.facilityId} onValueChange={v => setFormData({...formData, facilityId: v || ""})}>
  <SelectTrigger className="mt-1.5">
- <SelectValue placeholder="Chọn cơ sở">
- {formData.facilityId ? facilities.find((f: any) => f.id === formData.facilityId)?.name : "Chọn cơ sở"}
+ <SelectValue placeholder="Chọn chi nhánh">
+ {formData.facilityId ? facilities.find((f: any) => f.id === formData.facilityId)?.name : "Chọn chi nhánh"}
  </SelectValue>
  </SelectTrigger>
  <SelectContent>
@@ -581,7 +581,7 @@ export default function AdminRoomsPage() {
  <TableRow className="bg-zinc-50 ">
  <TableHead className="font-semibold">Mã phòng</TableHead>
  <TableHead className="font-semibold">Tên phòng</TableHead>
- <TableHead className="font-semibold">Cơ sở</TableHead>
+ <TableHead className="font-semibold">Chi nhánh</TableHead>
  <TableHead className="font-semibold">Loại</TableHead>
  <TableHead className="font-semibold text-right">11:00-14:00</TableHead>
  <TableHead className="font-semibold text-right">14:30-17:30</TableHead>

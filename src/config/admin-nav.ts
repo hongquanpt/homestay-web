@@ -31,7 +31,7 @@ export const adminNavItems: NavItem[] = [
  icon: LayoutDashboard,
  },
  {
- title: "Cơ sở",
+ title: "Chi nhánh",
  href: "/hms-portal-9f8b2c1a/facilities",
  icon: Building2,
  roles: ["Super Admin", "Reception"],

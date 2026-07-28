@@ -39,7 +39,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
     });
 
     if (roomsCount > 0) {
-      return NextResponse.json({ success: false, message: "Không thể xóa cơ sở đang có phòng. Vui lòng chuyển các phòng sang cơ sở khác trước." }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Không thể xóa chi nhánh đang có phòng. Vui lòng chuyển các phòng sang chi nhánh khác trước." }, { status: 400 });
     }
 
     await (prisma as any).facility.delete({

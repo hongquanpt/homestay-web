@@ -777,7 +777,7 @@ function BookingContent() {
             {/* Calendar */}
             <div className="border border-zinc-200 bg-white p-6 md:p-8">
               <div className="mb-4">
-                <Label className="font-oswald uppercase tracking-widest text-xs text-zinc-500 mb-2 block">CƠ SỞ (TÙY CHỌN)</Label>
+                <Label className="font-oswald uppercase tracking-widest text-xs text-zinc-500 mb-2 block">CHI NHÁNH (TÙY CHỌN)</Label>
                 <select
                   className="w-full flex h-12 border-b border-zinc-300 bg-transparent px-0 py-2 text-lg font-oswald uppercase tracking-wider text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-primary transition-colors cursor-pointer"
                   value={selectedFacilityId}
@@ -785,7 +785,7 @@ function BookingContent() {
                     setSelectedFacilityId(e.target.value);
                   }}
                 >
-                  <option value="">-- TẤT CẢ CƠ SỞ --</option>
+                  <option value="">-- TẤT CẢ CHI NHÁNH --</option>
                   {facilities.map(f => (
                     <option key={f.id} value={f.id}>{f.name}</option>
                   ))}

@@ -10,8 +10,10 @@ import {
  TrendingDown,
  CalendarDays,
  DoorOpen,
- Banknote
+ Banknote,
+ AlertTriangle
 } from "lucide-react";
+import { RevenueChart } from "./revenue-chart";
 
 export default function AdminDashboardPage() {
  const [stats, setStats] = useState({
@@ -24,7 +26,13 @@ export default function AdminDashboardPage() {
  bookingsChange: 0,
  occupancy: 0,
  guests: 0,
+ adminLeaderboardToday: [],
+ adminLeaderboardMonth: [],
+ adminLeaderboardYear: [],
+ revenueChartData: [],
+ showPasswordReminder: false,
  });
+ const [leaderboardTab, setLeaderboardTab] = useState<'today' | 'month' | 'year'>('month');
  const [loading, setLoading] = useState(true);
 
  useEffect(() => {
@@ -42,6 +50,11 @@ export default function AdminDashboardPage() {
  bookingsChange: parseFloat(data.bookingsChange) || 0,
  occupancy: data.occupancy || 0,
  guests: data.guests || 0,
+ adminLeaderboardToday: data.adminLeaderboardToday || [],
+ adminLeaderboardMonth: data.adminLeaderboardMonth || [],
+ adminLeaderboardYear: data.adminLeaderboardYear || [],
+ revenueChartData: data.revenueChartData || [],
+ showPasswordReminder: data.showPasswordReminder || false,
  });
  } catch (e) {
  console.error(e);
@@ -54,6 +67,18 @@ export default function AdminDashboardPage() {
 
  return (
  <div className="space-y-6">
+ {stats.showPasswordReminder && (
+    <div className="bg-orange-50 border border-orange-200 p-4 rounded-xl shadow-sm flex items-start gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+      <div className="p-2 bg-orange-100 text-orange-600 rounded-lg shrink-0">
+        <AlertTriangle className="w-5 h-5" />
+      </div>
+      <div>
+        <h3 className="text-orange-800 font-bold text-sm mb-1">Nhắc nhở định kỳ: Thay đổi Mật khẩu cửa/phòng</h3>
+        <p className="text-orange-700 text-xs">Hôm nay là ngày quy định (15 hoặc cuối tháng). Quản trị viên vui lòng tiến hành thay đổi toàn bộ mật khẩu các phòng để đảm bảo an ninh cho hệ thống.</p>
+      </div>
+    </div>
+  )}
+
  <div>
  <h1 className="text-2xl font-bold text-zinc-900 ">Dashboard Tổng Quan</h1>
  <p className="text-sm text-zinc-500 mt-1">Xin chào, đây là tình hình hoạt động của Homestay hôm nay.</p>
@@ -136,18 +161,67 @@ export default function AdminDashboardPage() {
  </div>
  )}
 
- {/* Chart & Tables section can go here later */}
+ {/* Chart & Tables section */}
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
- <div className="lg:col-span-2 bg-white rounded-xl border border-zinc-200 p-6 shadow-sm min-h-[300px] flex items-center justify-center">
- <div className="text-center">
- <Activity className="w-8 h-8 text-zinc-300 mx-auto mb-3" />
- <p className="text-zinc-500 text-sm">Biểu đồ doanh thu đang được cập nhật</p>
- </div>
- </div>
+  <div className="lg:col-span-2 bg-white rounded-xl border border-zinc-200 p-6 shadow-sm min-h-[300px] flex flex-col">
+  <div className="flex justify-between items-center mb-6">
+  <h3 className="font-bold text-zinc-900">Doanh thu 7 ngày qua</h3>
+  </div>
+  <div className="flex-1 w-full min-h-[250px]">
+  <RevenueChart data={stats.revenueChartData} />
+  </div>
+  </div>
  <div className="bg-white rounded-xl border border-zinc-200 p-6 shadow-sm">
- <h3 className="font-bold text-zinc-900 mb-4">Hoạt động gần đây</h3>
+ <div className="flex justify-between items-center mb-4">
+ <h3 className="font-bold text-zinc-900">BXH Chốt Đơn (Tiền mặt)</h3>
+ <div className="flex bg-zinc-100 rounded-lg p-1">
+ <button 
+ onClick={() => setLeaderboardTab('today')}
+ className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${leaderboardTab === 'today' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+ >
+ Hôm nay
+ </button>
+ <button 
+ onClick={() => setLeaderboardTab('month')}
+ className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${leaderboardTab === 'month' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+ >
+ Tháng này
+ </button>
+ <button 
+ onClick={() => setLeaderboardTab('year')}
+ className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${leaderboardTab === 'year' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+ >
+ Năm nay
+ </button>
+ </div>
+ </div>
+ 
  <div className="space-y-4">
- <p className="text-sm text-zinc-500">Chưa có hoạt động nào</p>
+ {(leaderboardTab === 'today' ? stats.adminLeaderboardToday : leaderboardTab === 'month' ? stats.adminLeaderboardMonth : stats.adminLeaderboardYear).length === 0 ? (
+ <p className="text-sm text-zinc-500 text-center py-6">Chưa có dữ liệu</p>
+ ) : (
+ (leaderboardTab === 'today' ? stats.adminLeaderboardToday : leaderboardTab === 'month' ? stats.adminLeaderboardMonth : stats.adminLeaderboardYear).map((admin: any, index: number) => (
+ <div key={admin.adminId} className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 border border-zinc-100">
+ <div className="flex items-center gap-3">
+ <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+ index === 0 ? 'bg-yellow-100 text-yellow-700' :
+ index === 1 ? 'bg-slate-200 text-slate-700' :
+ index === 2 ? 'bg-orange-100 text-orange-700' :
+ 'bg-zinc-200 text-zinc-600'
+ }`}>
+ #{index + 1}
+ </div>
+ <div>
+ <p className="font-semibold text-zinc-900 text-sm">{admin.adminName}</p>
+ <p className="text-xs text-zinc-500">{admin.count} đơn</p>
+ </div>
+ </div>
+ <div className="text-right">
+ <p className="font-bold text-emerald-600">{admin.totalAmount.toLocaleString()}đ</p>
+ </div>
+ </div>
+ ))
+ )}
  </div>
  </div>
  </div>
