@@ -1081,9 +1081,12 @@ function BookingContent() {
                         </Label>
                         <label className="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-primary transition-colors cursor-pointer">
                           {card.front ? (
-                            <div className="flex items-center gap-2 text-sm text-primary font-oswald tracking-widest uppercase">
-                              <CheckCircle strokeWidth={1} className="w-5 h-5" />
-                              <span className="truncate max-w-[150px]">{card.front.name}</span>
+                            <div className="w-full h-full relative group overflow-hidden">
+                              <img src={URL.createObjectURL(card.front)} alt="Mặt trước" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                                <CheckCircle strokeWidth={1} className="w-6 h-6 mb-2 text-green-400" />
+                                <span className="font-oswald uppercase tracking-widest text-[10px]">NHẤP ĐỂ ĐỔI ẢNH</span>
+                              </div>
                             </div>
                           ) : (
                             <>
@@ -1103,9 +1106,12 @@ function BookingContent() {
                         </Label>
                         <label className="flex flex-col items-center justify-center h-40 border border-dashed border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-primary transition-colors cursor-pointer">
                           {card.back ? (
-                            <div className="flex items-center gap-2 text-sm text-primary font-oswald tracking-widest uppercase">
-                              <CheckCircle strokeWidth={1} className="w-5 h-5" />
-                              <span className="truncate max-w-[150px]">{card.back.name}</span>
+                            <div className="w-full h-full relative group overflow-hidden">
+                              <img src={URL.createObjectURL(card.back)} alt="Mặt sau" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                                <CheckCircle strokeWidth={1} className="w-6 h-6 mb-2 text-green-400" />
+                                <span className="font-oswald uppercase tracking-widest text-[10px]">NHẤP ĐỂ ĐỔI ẢNH</span>
+                              </div>
                             </div>
                           ) : (
                             <>
