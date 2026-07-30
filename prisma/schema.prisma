@@ -8,16 +8,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  roleId    String
-  role      Role     @relation(fields: [roleId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  auditLogs AuditLog[]
-  confirmedPayments Payment[] @relation("AdminConfirmedPayments")
+  id                String     @id @default(cuid())
+  email             String     @unique
+  password          String
+  name              String?
+  roleId            String
+  role              Role       @relation(fields: [roleId], references: [id])
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  auditLogs         AuditLog[]
+  confirmedPayments Payment[]  @relation("AdminConfirmedPayments")
 }
 
 model Role {
@@ -58,7 +58,6 @@ model Facility {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-
 
 model Room {
   id             String          @id @default(cuid())
@@ -124,10 +123,10 @@ model RoomDiscount {
   id          String   @id @default(cuid())
   roomId      String
   room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  dayOfWeek   Int      // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  packageId   String   // 'noon', 'afternoon', 'evening', 'overnight', or 'ALL'
-  discountPct Float?   
-  discountAmt Float?   
+  dayOfWeek   Int // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  packageId   String // 'noon', 'afternoon', 'evening', 'overnight', or 'ALL'
+  discountPct Float?
+  discountAmt Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -135,39 +134,39 @@ model RoomDiscount {
 }
 
 model SurchargeRule {
-  id            String   @id @default(cuid())
-  name          String
-  type          String   // 'DATE' or 'DAY_OF_WEEK'
-  targetDate    DateTime?
-  dayOfWeek     Int?     // 0 = Sunday, 6 = Saturday
-  packageId     String   // 'ALL', 'noon', 'afternoon', 'evening', 'overnight'
-  surchargePct  Float?
-  surchargeAmt  Float?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String    @id @default(cuid())
+  name         String
+  type         String // 'DATE' or 'DAY_OF_WEEK'
+  targetDate   DateTime?
+  dayOfWeek    Int? // 0 = Sunday, 6 = Saturday
+  packageId    String // 'ALL', 'noon', 'afternoon', 'evening', 'overnight'
+  surchargePct Float?
+  surchargeAmt Float?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Booking {
-  id            String          @id @default(cuid())
-  customerName  String
-  customerPhone String
-  customerEmail String?
-  numGuests     Int             @default(1)
-  notes         String?
+  id             String           @id @default(cuid())
+  customerName   String
+  customerPhone  String
+  customerEmail  String?
+  numGuests      Int              @default(1)
+  notes          String?
   frontIdCardUrl String?
   backIdCardUrl  String?
   idCardsJson    String?
-  totalAmount   Float
-  status        BookingStatus   @default(PENDING_PAYMENT)
-  couponId      String?
-  coupon        Coupon?         @relation(fields: [couponId], references: [id])
-  payment       Payment?
-  details       BookingDetail[]
-  products      BookingProduct[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  emailLogs     EmailLog[]
-  giftCampaigns GiftCampaign[]  @relation("BookingGifts")
+  totalAmount    Float
+  status         BookingStatus    @default(PENDING_PAYMENT)
+  couponId       String?
+  coupon         Coupon?          @relation(fields: [couponId], references: [id])
+  payment        Payment?
+  details        BookingDetail[]
+  products       BookingProduct[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  emailLogs      EmailLog[]
+  giftCampaigns  GiftCampaign[]   @relation("BookingGifts")
 }
 
 enum BookingStatus {
@@ -244,41 +243,41 @@ model PaymentTransaction {
 }
 
 model ProductCategory {
-  id          String    @id @default(cuid())
-  name        String    @unique // Đồ ăn, Nước uống, Trang trí...
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  name      String    @unique // Đồ ăn, Nước uống, Trang trí...
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Product {
-  id          String          @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   price       Float
   imageUrl    String?
-  maxQuantity Int             @default(99)
+  maxQuantity Int              @default(99)
   categoryId  String
-  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  category    ProductCategory  @relation(fields: [categoryId], references: [id])
   bookings    BookingProduct[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model Coupon {
-  id            String        @id @default(cuid())
-  code          String        @unique
-  discountPct   Float?
-  discountAmt   Float?
-  validFrom     DateTime
-  validTo       DateTime
-  maxUsage      Int?
-  usedCount     Int           @default(0)
-  bookings      Booking[]
-  usages        CouponUsage[]
-  isPublic      Boolean       @default(true)
+  id                    String        @id @default(cuid())
+  code                  String        @unique
+  discountPct           Float?
+  discountAmt           Float?
+  validFrom             DateTime
+  validTo               DateTime
+  maxUsage              Int?
+  usedCount             Int           @default(0)
+  bookings              Booking[]
+  usages                CouponUsage[]
+  isPublic              Boolean       @default(true)
   autoSendAfterBookings Int?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 }
 
 model CouponUsage {
@@ -290,13 +289,13 @@ model CouponUsage {
 }
 
 model GiftCampaign {
-  id          String   @id @default(cuid())
-  name        String // Tặng nước, tặng hoa
-  condition   Json     // Điều kiện: đơn trên X tiền, qua đêm...
-  isActive    Boolean  @default(true)
-  bookings    Booking[] @relation("BookingGifts")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String    @id @default(cuid())
+  name      String // Tặng nước, tặng hoa
+  condition Json // Điều kiện: đơn trên X tiền, qua đêm...
+  isActive  Boolean   @default(true)
+  bookings  Booking[] @relation("BookingGifts")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model EmailLog {
@@ -305,17 +304,17 @@ model EmailLog {
   booking   Booking  @relation(fields: [bookingId], references: [id])
   recipient String
   subject   String
-  status    String   // SENT, FAILED
+  status    String // SENT, FAILED
   error     String?
   sentAt    DateTime @default(now())
 }
 
 model SystemSetting {
-  id            String   @id @default(cuid())
-  key           String   @unique
-  value         String
-  description   String?
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
 }
 
 model AuditLog {

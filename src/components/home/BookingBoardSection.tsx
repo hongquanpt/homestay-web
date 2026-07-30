@@ -299,7 +299,7 @@ export function BookingBoardSection() {
                       Tên phòng
                     </th>
                     {boardData.rooms.map((room, idx) => (
-                      <th key={`room-${room.id}`} colSpan={4} className={`sticky top-0 z-20 bg-zinc-50 text-zinc-900 border-b p-4 text-center font-oswald tracking-widest uppercase text-sm ${idx === boardData.rooms.length - 1 ? 'border-r border-zinc-200' : 'border-r-[3px] border-zinc-400'}`}>
+                      <th key={`room-${room.id}`} colSpan={4} className={`sticky top-0 z-20 bg-zinc-50 text-zinc-900 border-b border-b-zinc-200 p-4 text-center font-oswald tracking-widest uppercase text-sm ${idx === boardData.rooms.length - 1 ? 'border-r border-r-zinc-200' : 'border-r-[3px] border-r-zinc-400'}`}>
                         {room.name}
                       </th>
                     ))}
@@ -312,7 +312,7 @@ export function BookingBoardSection() {
                       defaultBookingPackages.map((pkg, pIdx) => {
                         const isLastRoom = rIdx === boardData.rooms.length - 1;
                         const isLastPkg = pIdx === defaultBookingPackages.length - 1;
-                        const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-[3px] border-zinc-400' : 'border-r border-zinc-200';
+                        const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-[3px] border-r-zinc-400 border-b-zinc-200' : 'border-r border-r-zinc-200 border-b-zinc-200';
                         return (
                           <th key={`pkg-${room.id}-${pkg.id}`} className={`sticky top-[53px] z-20 bg-white text-zinc-600 border-b p-3 text-center text-xs w-24 font-light tracking-wider ${borderClass}`}>
                             <div className="text-zinc-900">{pkg.start} - {pkg.end}</div>
@@ -334,7 +334,7 @@ export function BookingBoardSection() {
                           const isSelected = selectedCells.some(c => c.roomId === cell.roomId && c.dateStr === cell.dateStr && c.pkgId === cell.id);
                           const isLastRoom = roomIdx === day.roomCells.length - 1;
                           const isLastPkg = cellIdx === roomPkgs.length - 1;
-                          const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-[3px] border-zinc-400' : 'border-r border-zinc-200';
+                          const borderClass = (isLastPkg && !isLastRoom) ? 'border-r-[3px] border-r-zinc-400 border-b-zinc-200' : 'border-r border-r-zinc-200 border-b-zinc-200';
                           
                           let cellClass = `cursor-pointer transition-colors border-b p-1 text-center h-20 relative ${borderClass} `;
                           if (cell.isBooked) {

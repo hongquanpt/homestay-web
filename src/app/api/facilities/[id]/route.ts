@@ -23,7 +23,27 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
       data: dataToUpdate
     });
 
-    return NextResponse.json({ success: true, data: facility });
+    if (body.gatePassword !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: `facility_gate_password_${facility.id}` },
+        update: { value: body.gatePassword },
+        create: { key: `facility_gate_password_${facility.id}`, value: body.gatePassword }
+      });
+
+      // Update doorPassword for all rooms in this facility
+      const rooms = await prisma.room.findMany({
+        where: { facilityId: facility.id }
+      });
+      
+      if (rooms.length > 0) {
+        await prisma.roomAccessInfo.updateMany({
+          where: { roomId: { in: rooms.map((r: any) => r.id) } },
+          data: { doorPassword: body.gatePassword }
+        });
+      }
+    }
+
+    return NextResponse.json({ success: true, data: { ...facility, gatePassword: body.gatePassword } });
   } catch (error) {
     console.error("PUT /api/facilities/[id] error:", error);
     return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
@@ -45,6 +65,14 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
     await (prisma as any).facility.delete({
       where: { id: params.id }
     });
+
+    try {
+      await prisma.systemSetting.delete({
+        where: { key: `facility_gate_password_${params.id}` }
+      });
+    } catch (e) {
+      // Ignore if setting doesn't exist
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

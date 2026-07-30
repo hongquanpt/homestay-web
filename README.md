@@ -323,18 +323,26 @@ sudo apt install -y curl git build-essential ufw
 
 ### Bước 7: Cấu Hình Domain & Bảo Mật Cloudflare
 
-1. **Trỏ tên miền (DNS):**
+1. **Trỏ tên miền (DNS) - Bắt buộc:**
    - Đăng nhập Cloudflare -> **DNS**.
    - Thêm bản ghi `A`, Name `@`, IPv4 `IP_VPS_CỦA_BẠN`, bật đám mây màu cam 🟠 (Proxied).
    - Thêm bản ghi `CNAME`, Name `www`, Target `@`, bật đám mây màu cam 🟠.
+   *(Việc bật đám mây cam giúp ẩn IP thực của VPS và tự động kích hoạt bảo vệ chống DDoS Layer 3/4 của Cloudflare).*
 
 2. **Cấu hình SSL/TLS (Mã hóa HTTPS):**
    - Chọn mục **SSL/TLS -> Overview**.
    - Thiết lập thành **Flexible** (nếu Nginx đang dùng HTTP Port 80) hoặc **Full**. Cloudflare sẽ tự động cấp chứng chỉ HTTPS cho website của bạn.
 
-3. **Bảo mật WAF:**
-   - Bật **Bot Fight Mode** trong phần Security.
-   - Thêm rules Rate Limiting cho API thanh toán nếu cần.
+3. **Tối ưu Bảo mật WAF & Chống DDoS (Layer 7):**
+   - **Security Level**: Hiện tại Cloudflare đã tự động hóa mức độ bảo mật (mặc định là *'always protected'*). Bạn không cần (và không thể) chọn thủ công High/Medium như trước đây nữa.
+   - Truy cập **Security -> Settings**:
+     + Đảm bảo đã bật **Browser Integrity Check** (On) để chặn các truy cập từ script/bot xấu.
+     + Tại phần **Configurations** (ngay bên dưới), bạn có thể bật **I'm under attack mode** nếu website đang bị tấn công ồ ạt gây chậm/sập.
+   - Truy cập **Security -> Bots**: Bật **Bot Fight Mode**.
+   - Truy cập **Security -> WAF -> Rate Limiting rules**: (Khuyến nghị) Tạo rule giới hạn truy cập cho các API nhạy cảm (như `/api/auth`, `/api/payment`) để chống brute-force và spam.
+
+5. **Bảo mật máy chủ VPS (Chống Bypass Cloudflare):**
+   - Để ngăn chặn hacker tìm ra IP thật của VPS và tấn công trực tiếp (bỏ qua Cloudflare), bạn nên dùng tường lửa `ufw` trên VPS để **chỉ cho phép traffic từ các dải IP của Cloudflare** truy cập vào cổng 80/443. (Bạn có thể tra cứu "Cloudflare IP ranges" để áp dụng cho `ufw`).
 
 ---
 

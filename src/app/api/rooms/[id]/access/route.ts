@@ -48,6 +48,15 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
  const { id } = params;
  const body = await request.json();
  
+  // Tự động đồng bộ mật khẩu cổng từ chi nhánh
+  const room = await prisma.room.findUnique({ where: { id }, select: { facilityId: true } });
+  if (room?.facilityId) {
+    const setting = await prisma.systemSetting.findUnique({ where: { key: `facility_gate_password_${room.facilityId}` } });
+    if (setting) {
+      body.doorPassword = setting.value;
+    }
+  }
+
  const upsertedAccessInfo = await prisma.roomAccessInfo.upsert({
  where: { roomId: id },
  update: {

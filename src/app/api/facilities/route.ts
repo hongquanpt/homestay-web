@@ -18,7 +18,19 @@ export async function GET(request: Request) {
       }
     });
 
-    return NextResponse.json({ success: true, data: facilities });
+    const settings = await prisma.systemSetting.findMany({
+      where: { key: { startsWith: 'facility_gate_password_' } }
+    });
+
+    const facilitiesWithGatePassword = facilities.map((f: any) => {
+      const setting = settings.find((s: any) => s.key === `facility_gate_password_${f.id}`);
+      return {
+        ...f,
+        gatePassword: setting ? setting.value : ""
+      };
+    });
+
+    return NextResponse.json({ success: true, data: facilitiesWithGatePassword });
   } catch (error) {
     console.error("GET /api/facilities error:", error);
     return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
@@ -28,7 +40,7 @@ export async function GET(request: Request) {
   export async function POST(req: Request) {
     try {
       const body = await req.json();
-      const { name, address, description, imageUrl, isActive } = body;
+      const { name, address, description, imageUrl, isActive, gatePassword } = body;
   
       if (!name) {
         return NextResponse.json({ success: false, message: "Name is required" }, { status: 400 });
@@ -44,7 +56,15 @@ export async function GET(request: Request) {
         }
       });
 
-    return NextResponse.json({ success: true, data: facility });
+      if (gatePassword !== undefined) {
+        await prisma.systemSetting.upsert({
+          where: { key: `facility_gate_password_${facility.id}` },
+          update: { value: gatePassword },
+          create: { key: `facility_gate_password_${facility.id}`, value: gatePassword }
+        });
+      }
+
+    return NextResponse.json({ success: true, data: { ...facility, gatePassword: gatePassword || "" } });
   } catch (error) {
     console.error("POST /api/facilities error:", error);
     return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });

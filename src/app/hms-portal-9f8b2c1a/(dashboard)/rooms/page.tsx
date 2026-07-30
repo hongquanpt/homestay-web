@@ -82,7 +82,6 @@ export default function AdminRoomsPage() {
  houseNumber: "",
  roomNumber: "",
  floor: "",
- doorPassword: "",
  roomPassword: "",
  wifiName: "",
  wifiPassword: "",
@@ -225,7 +224,7 @@ export default function AdminRoomsPage() {
  setSelectedRoomId(roomId);
  setAccessData({
  address: "", houseNumber: "", roomNumber: "", floor: "",
- doorPassword: "", roomPassword: "", wifiName: "", wifiPassword: "",
+ roomPassword: "", wifiName: "", wifiPassword: "",
  parkingInfo: "", googleMapsUrl: ""
  });
  setAccessOpen(true);
@@ -240,7 +239,6 @@ export default function AdminRoomsPage() {
  houseNumber: data.houseNumber || "",
  roomNumber: data.roomNumber || "",
  floor: data.floor || "",
- doorPassword: data.doorPassword || "",
  roomPassword: data.roomPassword || "",
  wifiName: data.wifiName || "",
  wifiPassword: data.wifiPassword || "",
@@ -682,7 +680,6 @@ export default function AdminRoomsPage() {
  <div><Label>Số nhà / Tên tòa nhà</Label><Input value={accessData.houseNumber} onChange={e => setAccessData({...accessData, houseNumber: e.target.value})} /></div>
  <div><Label>Số phòng</Label><Input value={accessData.roomNumber} onChange={e => setAccessData({...accessData, roomNumber: e.target.value})} /></div>
  <div><Label>Tầng</Label><Input value={accessData.floor} onChange={e => setAccessData({...accessData, floor: e.target.value})} /></div>
- <div><Label>Mật khẩu cửa cổng</Label><Input value={accessData.doorPassword} onChange={e => setAccessData({...accessData, doorPassword: e.target.value})} /></div>
  <div><Label>Mật khẩu cửa phòng</Label><Input value={accessData.roomPassword} onChange={e => setAccessData({...accessData, roomPassword: e.target.value})} /></div>
  <div><Label>Tên Wifi</Label><Input value={accessData.wifiName} onChange={e => setAccessData({...accessData, wifiName: e.target.value})} /></div>
  <div><Label>Mật khẩu Wifi</Label><Input value={accessData.wifiPassword} onChange={e => setAccessData({...accessData, wifiPassword: e.target.value})} /></div>

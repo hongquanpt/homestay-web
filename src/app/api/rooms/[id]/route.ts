@@ -33,6 +33,16 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
  },
  });
 
+  if (facilityId !== undefined && facilityId !== null) {
+    const setting = await prisma.systemSetting.findUnique({ where: { key: `facility_gate_password_${facilityId}` } });
+    if (setting) {
+      await prisma.roomAccessInfo.updateMany({
+        where: { roomId: id },
+        data: { doorPassword: setting.value }
+      });
+    }
+  }
+
  await prisma.auditLog.create({
  data: {
  userId: session.user.id,

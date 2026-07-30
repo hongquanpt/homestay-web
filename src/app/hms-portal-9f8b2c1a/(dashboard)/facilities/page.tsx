@@ -11,6 +11,7 @@ type Facility = {
   description: string | null;
   imageUrl: string | null;
   isActive: boolean;
+  gatePassword?: string;
   _count?: {
     rooms: number;
   }
@@ -28,6 +29,7 @@ export default function FacilitiesPage() {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [gatePassword, setGatePassword] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
@@ -90,6 +92,7 @@ export default function FacilitiesPage() {
           description,
           imageUrl,
           isActive,
+          gatePassword,
         }),
       });
 
@@ -103,6 +106,7 @@ export default function FacilitiesPage() {
         setDescription("");
         setImageUrl("");
         setIsActive(true);
+        setGatePassword("");
         Swal.fire('Thành công', editingId ? 'Đã cập nhật chi nhánh' : 'Đã thêm chi nhánh mới', 'success');
       } else {
         Swal.fire('Lỗi', 'Có lỗi xảy ra khi lưu chi nhánh', 'error');
@@ -118,6 +122,7 @@ export default function FacilitiesPage() {
     setDescription(facility.description || "");
     setImageUrl(facility.imageUrl || "");
     setIsActive(facility.isActive !== false);
+    setGatePassword(facility.gatePassword || "");
     setEditingId(facility.id);
     setIsAdding(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -167,6 +172,7 @@ export default function FacilitiesPage() {
               setDescription("");
               setImageUrl("");
               setIsActive(true);
+              setGatePassword("");
             }
           }}
           className="flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded hover:bg-zinc-800"
@@ -211,6 +217,17 @@ export default function FacilitiesPage() {
                 onChange={e => setDescription(e.target.value)}
                 className="w-full border p-2 rounded h-20"
                 placeholder="Giới thiệu về chi nhánh này"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Mật khẩu cửa cổng (Tùy chọn)</label>
+              <input
+                type="text"
+                value={gatePassword}
+                onChange={e => setGatePassword(e.target.value)}
+                className="w-full border p-2 rounded bg-zinc-50 focus:bg-white"
+                placeholder="VD: 123456 (Sẽ tự động áp dụng cho tất cả các phòng thuộc chi nhánh này)"
               />
             </div>
 
@@ -289,6 +306,7 @@ export default function FacilitiesPage() {
               <tr>
                 <th className="px-6 py-4 w-20">Hình ảnh</th>
                 <th className="px-6 py-4">Tên Chi nhánh</th>
+                <th className="px-6 py-4">Mật khẩu cổng</th>
                 <th className="px-6 py-4 text-center">Trạng thái</th>
                 <th className="px-6 py-4">Địa chỉ</th>
                 <th className="px-6 py-4 text-center">Số phòng</th>
@@ -308,6 +326,7 @@ export default function FacilitiesPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 font-medium text-zinc-900">{facility.name}</td>
+                  <td className="px-6 py-4 font-mono text-zinc-600">{facility.gatePassword || "-"}</td>
                   <td className="px-6 py-4 text-center">
                     <span className={`px-2 py-1 text-xs rounded-full ${facility.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {facility.isActive !== false ? "Hoạt động" : "Tạm dừng"}
