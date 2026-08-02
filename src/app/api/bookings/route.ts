@@ -63,15 +63,15 @@ export async function GET(request: Request) {
   }
  });
 
- const phoneNumbers = Array.from(new Set(bookings.map(b => b.customerPhone)));
+ const phoneNumbers = Array.from(new Set(bookings.map((b: any) => b.customerPhone)));
  const phoneCounts = await prisma.booking.groupBy({
   by: ['customerPhone'],
   where: { customerPhone: { in: phoneNumbers }, status: { not: "CANCELLED" } },
   _count: { id: true }
  });
- const countMap = new Map(phoneCounts.map(pc => [pc.customerPhone, pc._count.id]));
+ const countMap = new Map(phoneCounts.map((pc: any) => [pc.customerPhone, pc._count.id]));
 
- const enhancedBookings = bookings.map(b => ({
+ const enhancedBookings = bookings.map((b: any) => ({
   ...b,
   visitCount: countMap.get(b.customerPhone) || 1
  }));
@@ -118,8 +118,8 @@ export async function POST(request: Request) {
       const timeSettings = await prisma.systemSetting.findMany({
         where: { key: { in: ['cash_payment_start_time', 'cash_payment_end_time'] } }
       });
-      const startSetting = timeSettings.find(s => s.key === 'cash_payment_start_time')?.value;
-      const endSetting = timeSettings.find(s => s.key === 'cash_payment_end_time')?.value;
+      const startSetting = timeSettings.find((s: any) => s.key === 'cash_payment_start_time')?.value;
+      const endSetting = timeSettings.find((s: any) => s.key === 'cash_payment_end_time')?.value;
 
       if (startSetting && endSetting) {
         const now = new Date();
@@ -182,20 +182,20 @@ export async function POST(request: Request) {
       }
     }
 
-    let bookingId = null;
-    let paymentId = null;
-    let qrUrl = null;
-    let payosUrl = null;
-    let orderCode = null;
+    let bookingId: string | null = null;
+    let paymentId: string | null = null;
+    let qrUrl: string | null = null;
+    let payosUrl: string | null = null;
+    let orderCode: number | null = null;
 
     if (paymentMethod === "QR_BANKING" || !paymentMethod) {
       // 1. Dùng RAM (Không lưu DB)
       const settingsDb = await prisma.systemSetting.findMany({
         where: { key: { in: ['payos_client_id', 'payos_api_key', 'payos_checksum_key', 'bank_bin', 'bank_account_no', 'bank_prefix'] } }
       });
-      const payosClientId = settingsDb.find(s => s.key === 'payos_client_id')?.value;
-      const payosApiKey = settingsDb.find(s => s.key === 'payos_api_key')?.value;
-      const payosChecksumKey = settingsDb.find(s => s.key === 'payos_checksum_key')?.value;
+      const payosClientId = settingsDb.find((s: any) => s.key === 'payos_client_id')?.value;
+      const payosApiKey = settingsDb.find((s: any) => s.key === 'payos_api_key')?.value;
+      const payosChecksumKey = settingsDb.find((s: any) => s.key === 'payos_checksum_key')?.value;
 
       orderCode = parseInt(Date.now().toString().slice(-9) + Math.floor(Math.random() * 100).toString());
 
@@ -225,16 +225,16 @@ export async function POST(request: Request) {
           qrUrl = `https://img.vietqr.io/image/${paymentLink.bin}-${paymentLink.accountNumber}-compact.png?amount=${paymentLink.amount}&addInfo=${encodeURIComponent(paymentLink.description)}&accountName=${encodeURIComponent(paymentLink.accountName)}`;
         } catch (e) {
           console.error("PayOS Error:", e);
-          const bankId = settingsDb.find(s => s.key === 'bank_bin')?.value || "970436";
-          const accountNo = settingsDb.find(s => s.key === 'bank_account_no')?.value || "0123456789";
-          const prefix = settingsDb.find(s => s.key === 'bank_prefix')?.value || "DP";
+          const bankId = settingsDb.find((s: any) => s.key === 'bank_bin')?.value || "970436";
+          const accountNo = settingsDb.find((s: any) => s.key === 'bank_account_no')?.value || "0123456789";
+          const prefix = settingsDb.find((s: any) => s.key === 'bank_prefix')?.value || "DP";
           const addInfo = `${prefix} ${customerPhone.replace(/\D/g, '')} ${orderCode.toString().slice(-4)}`.substring(0, 50);
           qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalAmount}&addInfo=${encodeURIComponent(addInfo)}&accountName=HOMESTAY`;
         }
       } else {
-        const bankId = settingsDb.find(s => s.key === 'bank_bin')?.value || "970436";
-        const accountNo = settingsDb.find(s => s.key === 'bank_account_no')?.value || "0123456789";
-        const prefix = settingsDb.find(s => s.key === 'bank_prefix')?.value || "DP";
+        const bankId = settingsDb.find((s: any) => s.key === 'bank_bin')?.value || "970436";
+        const accountNo = settingsDb.find((s: any) => s.key === 'bank_account_no')?.value || "0123456789";
+        const prefix = settingsDb.find((s: any) => s.key === 'bank_prefix')?.value || "DP";
         const addInfo = `${prefix} ${customerPhone.replace(/\D/g, '')} ${orderCode.toString().slice(-4)}`.substring(0, 50);
         qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalAmount}&addInfo=${encodeURIComponent(addInfo)}&accountName=HOMESTAY`;
       }
@@ -250,7 +250,7 @@ export async function POST(request: Request) {
       bookingId = orderCode.toString();
     } else {
       // 2. Dùng DB (MANUAL)
-      const booking = await prisma.$transaction(async (tx) => {
+      const booking = await prisma.$transaction(async (tx: any) => {
         return await tx.booking.create({
           data: {
             customerName, customerPhone, customerEmail, numGuests: numGuests || 1, notes, frontIdCardUrl, backIdCardUrl, idCardsJson,

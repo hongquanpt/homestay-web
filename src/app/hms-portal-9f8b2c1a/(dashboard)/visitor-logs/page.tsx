@@ -19,7 +19,7 @@ export default async function VisitorLogsPage({ searchParams }: { searchParams: 
  });
 
  const blockedIps = await prisma.blacklistIp.findMany({ select: { ip: true } });
- const blockedIpSet = new Set(blockedIps.map(b => b.ip));
+ const blockedIpSet = new Set(blockedIps.map((b: any) => b.ip));
 
  // Get current retention setting
  const retentionSetting = await prisma.systemSetting.findUnique({
@@ -77,7 +77,7 @@ export default async function VisitorLogsPage({ searchParams }: { searchParams: 
  </div>
  </TableCell>
  </TableRow>
- ) : logs.map((log) => (
+ ) : logs.map((log: any) => (
  <TableRow key={log.id} className="hover:bg-zinc-50 :bg-zinc-800/50">
  <TableCell className="font-mono font-medium">{log.ip}</TableCell>
  <TableCell className="text-xs text-zinc-500 max-w-xs truncate" title={log.userAgent || ""}>

@@ -9,7 +9,7 @@ export async function GET() {
  try {
  const settings = await prisma.systemSetting.findMany();
  // Chuyển array thành object dạng { key: value }
- const settingsMap = settings.reduce((acc, curr) => {
+ const settingsMap = settings.reduce((acc: any, curr: any) => {
  acc[curr.key] = curr.value;
  return acc;
  }, {} as Record<string, string>);

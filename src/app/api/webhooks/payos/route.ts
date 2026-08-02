@@ -11,9 +11,9 @@ export async function POST(request: Request) {
     const settingsDb = await prisma.systemSetting.findMany({
       where: { key: { in: ['payos_client_id', 'payos_api_key', 'payos_checksum_key'] } }
     });
-    const payosClientId = settingsDb.find(s => s.key === 'payos_client_id')?.value;
-    const payosApiKey = settingsDb.find(s => s.key === 'payos_api_key')?.value;
-    const payosChecksumKey = settingsDb.find(s => s.key === 'payos_checksum_key')?.value;
+    const payosClientId = settingsDb.find((s: any) => s.key === 'payos_client_id')?.value;
+    const payosApiKey = settingsDb.find((s: any) => s.key === 'payos_api_key')?.value;
+    const payosChecksumKey = settingsDb.find((s: any) => s.key === 'payos_checksum_key')?.value;
 
     if (!payosClientId || !payosApiKey || !payosChecksumKey) {
       return NextResponse.json({ error: "PayOS not configured" }, { status: 400 });
@@ -34,12 +34,11 @@ export async function POST(request: Request) {
     
     // 1. Kiểm tra xem orderCode có nằm trong RAM Cache không
     const tempBooking = (global as any).tempBookings?.get(orderCode);
-    let finalBookingId = null;
-    let finalBooking = null;
+    let finalBookingId: string | null = null;
+    let finalBooking: any = null;
 
     if (tempBooking) {
-      // Bắt đầu ghi vào Database
-      const newBooking = await prisma.$transaction(async (tx) => {
+      const newBooking = await prisma.$transaction(async (tx: any) => {
         return await tx.booking.create({
           data: {
             customerName: tempBooking.customerName,

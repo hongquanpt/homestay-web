@@ -65,7 +65,7 @@ export async function GET(request: Request) {
       }
     }
 
-    const settingsMap = dbSettings.reduce((acc, curr) => {
+    const settingsMap = dbSettings.reduce((acc: Record<string, string>, curr: any) => {
       acc[curr.key] = curr.value;
       return acc;
     }, {} as Record<string, string>);

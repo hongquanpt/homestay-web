@@ -41,7 +41,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
  }
 
  const imageUrls = dbRoom.images.length > 0 
- ? dbRoom.images.map(img => img.url) 
+ ? dbRoom.images.map((img: any) => img.url) 
  : ["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=900&q=80"];
 
  // Lấy hotline từ DB
@@ -61,7 +61,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
  type: dbRoom.roomType.name,
  description: dbRoom.description || "Chưa có mô tả",
  images: imageUrls,
- amenities: dbRoom.amenities.map(a => {
+ amenities: dbRoom.amenities.map((a: any) => {
  // @ts-ignore
  const IconComponent = Icons[a.icon] || CheckCircle2;
  return { name: a.name, icon: IconComponent };
@@ -121,7 +121,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
  <div>
  <h2 className="text-lg font-bold text-zinc-900 mb-4">Tiện ích</h2>
  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
- {room.amenities.map((amenity) => (
+ {room.amenities.map((amenity: any) => (
  <div
  key={amenity.name}
  className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 border border-zinc-200"
@@ -163,7 +163,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
  <div className="card-bubble p-6">
  <h2 className="text-lg font-bold text-zinc-900 mb-4">Bảng giá</h2>
  <div className="space-y-3">
- {room.pricing.map((p, idx) => (
+ {room.pricing.map((p: any, idx: number) => (
  <div
  key={p.label}
  className={`flex items-center justify-between p-3.5 rounded-xl border transition-colors ${

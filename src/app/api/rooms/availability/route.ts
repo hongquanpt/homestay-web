@@ -31,7 +31,7 @@ export async function GET(request: Request) {
  }
  });
 
- const bookedIntervals = bookings.map(b => ({
+ const bookedIntervals = bookings.map((b: any) => ({
  startTime: b.startTime.toISOString(),
  endTime: b.endTime.toISOString(),
  }));

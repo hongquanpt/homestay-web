@@ -11,7 +11,7 @@ const getTransporter = async () => {
  }
  });
 
- const config = settings.reduce((acc, curr) => {
+ const config = settings.reduce((acc: any, curr: any) => {
  acc[curr.key] = curr.value;
  return acc;
  }, {} as Record<string, string>);

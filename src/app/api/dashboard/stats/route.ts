@@ -30,11 +30,11 @@ export async function GET() {
  const bookingsYesterday = bookingsYesterdayList.length;
 
  const revenueToday = bookingsTodayList
-  .filter(b => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
-  .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+  .filter((b: any) => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
+  .reduce((sum: number, b: any) => sum + (b.totalAmount || 0), 0);
  const revenueYesterday = bookingsYesterdayList
-  .filter(b => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
-  .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+  .filter((b: any) => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
+  .reduce((sum: number, b: any) => sum + (b.totalAmount || 0), 0);
 
  const revenueChange = revenueYesterday === 0 ? (revenueToday > 0 ? 100 : 0) : ((revenueToday - revenueYesterday) / revenueYesterday) * 100;
  const bookingsChange = bookingsYesterday === 0 ? (bookingsToday > 0 ? 100 : 0) : ((bookingsToday - bookingsYesterday) / bookingsYesterday) * 100;
@@ -57,11 +57,11 @@ export async function GET() {
  });
 
  const revenueThisMonth = bookingsThisMonthList
-  .filter(b => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
-  .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+  .filter((b: any) => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
+  .reduce((sum: number, b: any) => sum + (b.totalAmount || 0), 0);
  const revenueLastMonth = bookingsLastMonthList
-  .filter(b => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
-  .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+  .filter((b: any) => ['PAID', 'CHECKED_IN', 'COMPLETED', 'EMAIL_SENT'].includes(b.status))
+  .reduce((sum: number, b: any) => sum + (b.totalAmount || 0), 0);
 
  const revenueMonthChange = revenueLastMonth === 0 ? (revenueThisMonth > 0 ? 100 : 0) : ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100;
 
@@ -108,9 +108,9 @@ export async function GET() {
     revenueChartData.push({ date: dateStr, revenue: 0 });
   }
 
-  bookings7Days.forEach(b => {
+  bookings7Days.forEach((b: any) => {
     const dateStr = b.createdAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', timeZone });
-    const point = revenueChartData.find(p => p.date === dateStr);
+    const point = revenueChartData.find((p: any) => p.date === dateStr);
     if (point) {
       point.revenue += b.totalAmount || 0;
     }
@@ -152,31 +152,31 @@ export async function GET() {
     orderBy: { _sum: { amount: 'desc' } }
   });
 
-  const userIds = [...new Set([...adminPaymentsToday, ...adminPaymentsMonth, ...adminPaymentsYear].map(p => p.confirmedById).filter(Boolean))] as string[];
+  const userIds = [...new Set([...adminPaymentsToday, ...adminPaymentsMonth, ...adminPaymentsYear].map((p: any) => p.confirmedById).filter(Boolean))] as string[];
   const users = await prisma.user.findMany({
     where: { id: { in: userIds } },
     select: { id: true, name: true, email: true }
   });
-  const userMap = users.reduce((acc, user) => {
+  const userMap = users.reduce((acc: Record<string, string>, user: any) => {
     acc[user.id] = user.name || user.email.split('@')[0];
     return acc;
   }, {} as Record<string, string>);
 
-  const adminLeaderboardToday = adminPaymentsToday.filter(p => p.confirmedById).map(p => ({
+  const adminLeaderboardToday = adminPaymentsToday.filter((p: any) => p.confirmedById).map((p: any) => ({
     adminId: p.confirmedById,
     adminName: userMap[p.confirmedById as string] || 'Unknown',
     totalAmount: p._sum.amount || 0,
     count: p._count.id
   }));
 
-  const adminLeaderboardMonth = adminPaymentsMonth.filter(p => p.confirmedById).map(p => ({
+  const adminLeaderboardMonth = adminPaymentsMonth.filter((p: any) => p.confirmedById).map((p: any) => ({
     adminId: p.confirmedById,
     adminName: userMap[p.confirmedById as string] || 'Unknown',
     totalAmount: p._sum.amount || 0,
     count: p._count.id
   }));
 
-  const adminLeaderboardYear = adminPaymentsYear.filter(p => p.confirmedById).map(p => ({
+  const adminLeaderboardYear = adminPaymentsYear.filter((p: any) => p.confirmedById).map((p: any) => ({
     adminId: p.confirmedById,
     adminName: userMap[p.confirmedById as string] || 'Unknown',
     totalAmount: p._sum.amount || 0,

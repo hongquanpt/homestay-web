@@ -21,7 +21,7 @@ function formatVND(num: number) {
 
 export default async function HomePage() {
  const dbSettings = await prisma.systemSetting.findMany();
- const settings = dbSettings.reduce((acc, curr) => {
+ const settings = dbSettings.reduce((acc: any, curr: any) => {
  acc[curr.key] = curr.value;
  return acc;
  }, {} as Record<string, string>);
@@ -56,7 +56,7 @@ export default async function HomePage() {
   });
 
   const todayDiscounts: any[] = [];
-  dbRooms.forEach(room => {
+  dbRooms.forEach((room: any) => {
     room.discounts.forEach((d: any) => {
       todayDiscounts.push({
         roomName: room.name,
@@ -67,7 +67,7 @@ export default async function HomePage() {
     });
   });
 
-  const rooms = dbRooms.map(r => {
+  const rooms = dbRooms.map((r: any) => {
    const prices = [r.priceNoon, r.priceAfternoon, r.priceEvening, r.priceOvernight].filter(Boolean) as number[];
    const minPrice = prices.length > 0 ? Math.min(...prices) : 260000;
    
@@ -77,11 +77,11 @@ export default async function HomePage() {
      facilityId: r.facilityId,
      type: r.roomType.name,
      image: r.images[0]?.url || "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
-     images: r.images.map(img => img.url),
+     images: r.images.map((img: any) => img.url),
      price3h: formatVND(r.priceNoon ?? 260000),
      priceNight: formatVND(minPrice),
      description: r.description || "Chưa có mô tả",
-     amenities: r.amenities.map(a => a.name),
+     amenities: r.amenities.map((a: any) => a.name),
    };
   });
 
@@ -94,14 +94,14 @@ export default async function HomePage() {
  orderBy: { createdAt: 'desc' }
  });
  
- const promotions = dbCoupons.map(c => ({
+ const promotions = dbCoupons.map((c: any) => ({
  title: `Giảm ${c.discountPct ? c.discountPct + '%' : formatVND(c.discountAmt || 0)}`,
  desc: `Dành cho các lượt đặt phòng trước ${new Date(c.validTo).toLocaleDateString('vi-VN')}`,
  code: c.code
  }));
 
- const minPrice3h = dbRooms.length > 0 ? Math.min(...dbRooms.map(r => r.priceNoon ?? 260000)) : 260000;
- const minPriceNight = dbRooms.length > 0 ? Math.min(...dbRooms.map(r => r.priceOvernight ?? 420000)) : 420000;
+ const minPrice3h = dbRooms.length > 0 ? Math.min(...dbRooms.map((r: any) => r.priceNoon ?? 260000)) : 260000;
+ const minPriceNight = dbRooms.length > 0 ? Math.min(...dbRooms.map((r: any) => r.priceOvernight ?? 420000)) : 420000;
 
   const topAmenities = await prisma.amenity.findMany({ take: 4 });
 
@@ -128,14 +128,14 @@ export default async function HomePage() {
   ];
 
   let availableSlotsToday = 0;
-  dbRooms.forEach(room => {
-    defaultPackages.forEach(pkg => {
+  dbRooms.forEach((room: any) => {
+    defaultPackages.forEach((pkg: any) => {
       const pkgStart = new Date(`${todayStr}T${pkg.start}:00+07:00`).getTime();
       const pkgEndObj = new Date(`${todayStr}T${pkg.end}:00+07:00`);
       if (pkg.id === 'overnight') pkgEndObj.setDate(pkgEndObj.getDate() + 1);
       const pkgEnd = pkgEndObj.getTime();
       
-      const isBooked = dbBookings.some((b) => {
+      const isBooked = dbBookings.some((b: any) => {
         const bStart = new Date(b.startTime).getTime();
         const bEnd = new Date(b.endTime).getTime();
         return b.roomId === room.id && pkgStart < bEnd && pkgEnd > bStart;

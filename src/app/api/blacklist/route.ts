@@ -27,9 +27,9 @@ export async function GET(request: Request) {
  ]);
 
  const blacklist = [
- ...ips.map(ip => ({ id: ip.id, type: "IP", value: ip.ip, reason: ip.reason, createdAt: ip.createdAt })),
- ...phones.map(phone => ({ id: phone.id, type: "Phone", value: phone.phone, reason: phone.reason, createdAt: phone.createdAt })),
- ...emails.map(email => ({ id: email.id, type: "Email", value: email.email, reason: email.reason, createdAt: email.createdAt })),
+  ...ips.map((ip: any) => ({ id: ip.id, type: "IP", value: ip.ip, reason: ip.reason, createdAt: ip.createdAt })),
+  ...phones.map((phone: any) => ({ id: phone.id, type: "Phone", value: phone.phone, reason: phone.reason, createdAt: phone.createdAt })),
+  ...emails.map((email: any) => ({ id: email.id, type: "Email", value: email.email, reason: email.reason, createdAt: email.createdAt })),
  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
  return NextResponse.json(blacklist);

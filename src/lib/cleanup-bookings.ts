@@ -23,7 +23,7 @@ export async function cleanupExpiredBookings() {
  select: { id: true }
  });
 
- const allExpiredIds = [...expiredQR.map(b => b.id), ...expiredManual.map(b => b.id)];
+ const allExpiredIds = [...expiredQR.map((b: any) => b.id), ...expiredManual.map((b: any) => b.id)];
 
  if (allExpiredIds.length > 0) {
  await prisma.booking.updateMany({

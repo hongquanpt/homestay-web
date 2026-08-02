@@ -19,7 +19,7 @@ export async function POST(request: Request) {
  // 1. Extract booking ID from the content
  // We expect content to contain the bookingId, e.g., "Thanh toan cm2x3abcd0001xyz"
  const words = content.split(" ");
- let bookingId = null;
+ let bookingId: string | null = null;
  
  // We assume the bookingId is somewhere in the content. Let's just find a matching booking.
  // In a real scenario, you'd parse exactly according to your syntax.
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
  }
 
  // 3. Full Payment Successful
- await prisma.$transaction(async (tx) => {
+ await prisma.$transaction(async (tx: any) => {
  await tx.paymentTransaction.create({
  data: {
  paymentId: booking.payment!.id,
