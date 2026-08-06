@@ -539,16 +539,17 @@ export default function AdminRoomsPage() {
  </div>
  <div>
  <Label>Trạng thái</Label>
- <Select value={formData.status} onValueChange={v => setFormData({...formData, status: v || "ACTIVE"})}>
- <SelectTrigger className="mt-1.5">
- <SelectValue placeholder="Chọn trạng thái">
- {formData.status === "ACTIVE" ? "Đang hoạt động" : "Tạm ngưng"}
- </SelectValue>
- </SelectTrigger>
- <SelectContent>
- <SelectItem value="ACTIVE">Đang hoạt động</SelectItem>
- <SelectItem value="MAINTENANCE">Bảo trì</SelectItem>
- </SelectContent>
+  <Select value={formData.status} onValueChange={v => setFormData({...formData, status: v || "ACTIVE"})}>
+  <SelectTrigger className="mt-1.5">
+  <SelectValue placeholder="Chọn trạng thái">
+  {formData.status === "ACTIVE" ? "Đang hoạt động" : formData.status === "COMING_SOON" ? "Sắp ra mắt" : "Tạm ngưng"}
+  </SelectValue>
+  </SelectTrigger>
+  <SelectContent>
+  <SelectItem value="ACTIVE">Đang hoạt động</SelectItem>
+  <SelectItem value="COMING_SOON">Sắp ra mắt</SelectItem>
+  <SelectItem value="MAINTENANCE">Bảo trì</SelectItem>
+  </SelectContent>
  </Select>
  </div>
  <div className="pt-2 flex justify-end gap-2">
@@ -620,9 +621,11 @@ export default function AdminRoomsPage() {
  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
  room.status === "ACTIVE" 
  ? "bg-emerald-100 text-emerald-700 "
+ : room.status === "COMING_SOON"
+ ? "bg-orange-100 text-orange-700 "
  : "bg-primary/10 text-primary "
  }`}>
- {room.status === "ACTIVE" ? "Đang hoạt động" : "Bảo trì"}
+ {room.status === "ACTIVE" ? "Đang hoạt động" : room.status === "COMING_SOON" ? "Sắp ra mắt" : "Bảo trì"}
  </span>
  </TableCell>
  <TableCell className="text-right">

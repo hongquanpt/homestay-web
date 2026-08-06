@@ -120,23 +120,29 @@ export function AllRoomsSection({ rooms, homestayName }: { rooms: any[]; homesta
                   </div>
                   
                   {/* Content overlay on active slide */}
-                  <div className="absolute inset-x-[20%] bottom-[14%] flex flex-col items-center justify-end opacity-0 group-[.swiper-slide-active]:opacity-100 transition-opacity duration-500 delay-300 z-30">
+                  <div className="absolute inset-x-[20%] bottom-[18%] flex flex-col items-center justify-end opacity-0 group-[.swiper-slide-active]:opacity-100 transition-opacity duration-500 delay-300 z-30">
                     <h3 className="text-xl md:text-2xl font-oswald font-bold uppercase text-[#d4b48f] mb-1 drop-shadow-md text-center">{room.name}</h3>
-                    <p className="text-white/90 font-light tracking-wider text-[10px] md:text-xs mb-3 text-center">
+                    <p className="text-white/90 font-light tracking-wider text-[10px] md:text-xs mb-2 text-center">
                       giá từ: <span className="text-white font-bold">{room.priceNight}</span>
                     </p>
-                    <div className="flex flex-col gap-2 w-[100px] md:w-[110px] mx-auto">
+                    <div className="flex flex-col gap-1.5 w-[85px] md:w-[95px] mx-auto">
                       <RoomDetailDialog room={room}>
-                        <button className="w-full inline-block border border-white/50 text-white bg-black/40 backdrop-blur-md py-1.5 text-[8px] md:text-[9px] uppercase tracking-[0.15em] hover:bg-white hover:text-black transition-colors">
+                        <button className="w-full inline-block border border-white/50 text-white bg-black/40 backdrop-blur-md py-1 text-[7px] md:text-[8px] uppercase tracking-[0.15em] hover:bg-white hover:text-black transition-colors">
                           chi tiết
                         </button>
                       </RoomDetailDialog>
-                      <Link 
-                        href={`/booking?room=${room.id}`}
-                        className="w-full text-center inline-block border border-[#d4b48f] text-[#d4b48f] bg-black/40 backdrop-blur-md py-1.5 text-[8px] md:text-[9px] uppercase tracking-[0.15em] hover:bg-[#d4b48f] hover:text-black transition-colors"
-                      >
-                        đặt ngay
-                      </Link>
+                      {room.status === "COMING_SOON" ? (
+                        <button disabled className="w-full text-center inline-block border border-zinc-500 text-zinc-400 bg-black/40 backdrop-blur-md py-1 text-[7px] md:text-[8px] uppercase tracking-[0.15em] cursor-not-allowed">
+                          sắp ra mắt
+                        </button>
+                      ) : (
+                        <Link 
+                          href={`/booking?room=${room.id}`}
+                          className="w-full text-center inline-block border border-[#d4b48f] text-[#d4b48f] bg-black/40 backdrop-blur-md py-1 text-[7px] md:text-[8px] uppercase tracking-[0.15em] hover:bg-[#d4b48f] hover:text-black transition-colors"
+                        >
+                          đặt ngay
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

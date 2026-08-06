@@ -44,7 +44,7 @@ export default async function HomePage() {
   const todayDayOfWeek = vnTime.getDay();
 
   const dbRooms = await prisma.room.findMany({
-    where: { status: "ACTIVE" },
+    where: { status: { in: ["ACTIVE", "COMING_SOON"] } },
     include: { 
       roomType: true, 
       amenities: true, 
@@ -75,6 +75,7 @@ export default async function HomePage() {
      id: r.id,
      name: r.name,
      facilityId: r.facilityId,
+     status: r.status,
      type: r.roomType.name,
      image: r.images[0]?.url || "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
      images: r.images.map((img: any) => img.url),

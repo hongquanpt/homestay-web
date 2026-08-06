@@ -36,9 +36,9 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
 
  const surcharges = await (prisma as any).surchargeRule.findMany();
 
- if (!dbRoom) {
- notFound();
- }
+  if (!dbRoom || !["ACTIVE", "COMING_SOON"].includes(dbRoom.status)) {
+    notFound();
+  }
 
  const imageUrls = dbRoom.images.length > 0 
  ? dbRoom.images.map((img: any) => img.url) 
@@ -189,12 +189,19 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
   </p>
  </div>
 
- {/* Embedded Booking Widget */}
- <div id="booking-section" className="scroll-mt-24">
-  <div className="lg:sticky lg:top-24">
-    <BookingWidget roomId={room.id} roomName={room.name} room={dbRoom} surcharges={surcharges} />
+  {/* Embedded Booking Widget or Coming Soon Message */}
+  <div id="booking-section" className="scroll-mt-24">
+    {dbRoom.status === "COMING_SOON" ? (
+      <div className="lg:sticky lg:top-24 bg-white p-8 rounded-xl border border-zinc-200 text-center shadow-sm">
+        <h3 className="text-2xl font-oswald text-primary mb-2 uppercase">Sắp ra mắt</h3>
+        <p className="text-zinc-600">Phòng đang trong quá trình hoàn thiện và sẽ sớm ra mắt!</p>
+      </div>
+    ) : (
+      <div className="lg:sticky lg:top-24">
+        <BookingWidget roomId={room.id} roomName={room.name} room={dbRoom} surcharges={surcharges} />
+      </div>
+    )}
   </div>
- </div>
 
  {/* Info notes */}
  <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-200 ">
@@ -219,24 +226,26 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
  </div>
  </div>
 
- {/* Mobile Fixed Bottom Bar */}
- <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-zinc-200 p-4 lg:hidden shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)]">
- <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
- <div>
- <p className="text-sm text-zinc-500 ">Giá chỉ từ</p>
- <p className="text-lg font-bold text-primary">
- {formatVND(room.pricing[0].price)}
- <span className="text-sm font-normal text-zinc-500 "> / 3h</span>
- </p>
- </div>
- <a 
- href="#booking-section"
- className="flex-1 bg-gradient-to-r from-primary to-primary text-white font-medium text-center py-3 rounded-xl shadow-md active:scale-95 transition-transform"
- >
- Đặt phòng ngay
- </a>
- </div>
- </div>
- </div>
+  {/* Mobile Fixed Bottom Bar */}
+  {dbRoom.status !== "COMING_SOON" && (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-zinc-200 p-4 lg:hidden shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)]">
+      <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
+      <div>
+      <p className="text-sm text-zinc-500 ">Giá chỉ từ</p>
+      <p className="text-lg font-bold text-primary">
+      {formatVND(room.pricing[0].price)}
+      <span className="text-sm font-normal text-zinc-500 "> / 3h</span>
+      </p>
+      </div>
+      <a 
+      href="#booking-section"
+      className="flex-1 bg-gradient-to-r from-primary to-primary text-white font-medium text-center py-3 rounded-xl shadow-md active:scale-95 transition-transform"
+      >
+      Đặt phòng ngay
+      </a>
+      </div>
+    </div>
+  )}
+  </div>
  );
 }
